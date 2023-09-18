@@ -91,8 +91,11 @@ namespace Game.Systems
 
         private void OnDestroy()
         {
-            NetworkRoomStats.Instance.PlayerJoined -= OnPlayerJoined;
-            NetworkRoomStats.Instance.PlayerLeft -= OnPlayerLeft;
+            if(NetworkRoomStats.Instance != null)
+            {
+                NetworkRoomStats.Instance.PlayerJoined -= OnPlayerJoined;
+                NetworkRoomStats.Instance.PlayerLeft -= OnPlayerLeft;
+            }
         }
 
         private async void JoinLobby(NetworkRoomStats room)
@@ -108,43 +111,52 @@ namespace Game.Systems
         private void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
 
-            if (NetworkRoomStats.Instance.Runner.LocalPlayer == player)
+            if (runner.IsServer)
             {
                 var newPlayer = runner.Spawn(_playerPrefab, inputAuthority: player);
-                newPlayer.Name = Nickname;
+                newPlayer.Name = player.PlayerId.ToString();
                 runner.SetPlayerObject(player, newPlayer.Object);
-                _playerReadyButton.onClick.AddListener(() =>
-                {
-                    if (newPlayer != null)
-                    {
-                        if (newPlayer.ReadyToPlay.Value)
-                        {
-                            _playerReadyButton.targetGraphic.color = Color.white;
-                            _playerReadyButtonText.text = "Not Ready";
-                            newPlayer.ReadyToPlay.Value = false;
-                        }
-                        else
-                        {
-                            _playerReadyButton.targetGraphic.color = _playerReadyButtonColor;
-                            _playerReadyButtonText.text = "Ready";
-                            newPlayer.ReadyToPlay.Value = true;
-                        }
-                    }
-                });
                 newPlayer.ReadyToPlay.Subscribe(TryStartGame);
-            }
-            else
-            {
                 TryStartGame(false);
+
+                //TODO: Working only for server, but not for client!
+                if (player == runner.LocalPlayer)//if spawning self player
+                {
+                    _playerReadyButton.onClick.AddListener(() =>
+                    {
+                        if (NetworkRoomStats.Instance.Runner.TryGetPlayerObject(player, out var networkObject))
+                        {
+                            var playerEntity = networkObject.GetComponent<PlayerEntity>();
+                            if (playerEntity.ReadyToPlay.Value)
+                            {
+                                _playerReadyButton.targetGraphic.color = Color.white;
+                                _playerReadyButtonText.text = "Not Ready";
+                                playerEntity.ReadyToPlay.Value = false;
+                            }
+                            else
+                            {
+                                _playerReadyButton.targetGraphic.color = _playerReadyButtonColor;
+                                _playerReadyButtonText.text = "Ready";
+                                playerEntity.ReadyToPlay.Value = true;
+                            }
+                        }
+                    });
+                }
             }
         }
         private void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
             runner.GetPlayerObject(player).GetBehaviour<PlayerEntity>().ReadyToPlay.UnSubscribe(TryStartGame);
-            if (runner.LocalPlayer == player)
+            if (runner.IsServer)
             {
                 runner.Despawn(runner.GetPlayerObject(player));
                 TryStartGame(false);
+                Debug.Log(runner.SessionInfo.PlayerCount + " :  " + runner.SessionInfo.MaxPlayers);
+                if (runner.SessionInfo.PlayerCount < runner.SessionInfo.MaxPlayers)
+                {
+                    runner.SessionInfo.IsVisible = true;
+                    Debug.Log("Session is not full");
+                }
             }
         }
         private void TryStartGame(bool v)
@@ -157,7 +169,7 @@ namespace Game.Systems
                 {
                     if (networkObject.GetBehaviour<PlayerEntity>().ReadyToPlay.Value)
                         readyPlayersCount++;
-                    Debug.Log("For player " + player.PlayerId + " NObject - Not exist");
+                    Debug.Log("For player " + player.PlayerId + " NObject - exist");
                 }
                 else
                 {
