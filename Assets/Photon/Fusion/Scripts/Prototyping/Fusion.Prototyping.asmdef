@@ -1,0 +1,17 @@
+{
+    "name": "Fusion.Prototyping",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4d449a4732e064d26a3069f2cfd88917",
+        "GUID:1d94e1fc58c632648b7f2b50c7831183"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
