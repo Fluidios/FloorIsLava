@@ -128,6 +128,7 @@ namespace Game.Systems
             }
             else
             {
+                Debug.Log("Creating session...");
                 var result = await Runner.StartGame(new StartGameArgs()
                 {
                     GameMode = gameMode,
@@ -142,7 +143,7 @@ namespace Game.Systems
                 }
                 else
                 {
-                    Debug.Log("Creating session: " + Runner.SessionInfo.Name);
+                    Debug.Log("Session created: " + Runner.SessionInfo.Name);
                 }
             }
         }

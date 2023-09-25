@@ -1085,7 +1085,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -458.288, y: 37.927868}
+  m_AnchoredPosition: {x: -458.288, y: 4}
   m_SizeDelta: {x: 710.3463, y: 805.8552}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &692716857
@@ -4421,6 +4421,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2143074341}
+  - component: {fileID: 2143074342}
   - component: {fileID: 2143074340}
   m_Layer: 0
   m_Name: Lobby
@@ -4454,6 +4455,7 @@ MonoBehaviour:
   _loadingScreen: {fileID: 1987038469}
   _loadingScreenText: {fileID: 1967235605}
   _playerPrefab: {fileID: 81517895053557106, guid: 2cc5abedc6dc4094bb92199cdbcc8c71, type: 3}
+  _lobbyStatsPrefab: {fileID: 5811597598004368932, guid: d40ddc17cd754484b90f35d671bc5cf9, type: 3}
 --- !u!4 &2143074341
 Transform:
   m_ObjectHideFlags: 0
@@ -4469,6 +4471,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2143074342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2143074339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2561
+  NetworkGuid:
+    RawGuidValue: 2999c62124f54382b63f31ef1a59b4d6
+  NestedObjects: []
+  NetworkedBehaviours: []
+  SimulationBehaviours: []
 --- !u!222 &5165790282404861871
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using Fusion;
 using Game.Player;
 using Game.Systems;
 using Game.SystemsManagement;
@@ -9,7 +10,7 @@ namespace Game.System
 {
     public class PlayersSpawner : GameSystem
     {
-        [SerializeField] private PlayerController _playerPrefab;
+        [SerializeField] private NetworkObject _playerPrefab;
         [SerializeField] private Transform[] _spawnPoints;
 
         public override bool AsyncInitialization => false;
@@ -20,13 +21,13 @@ namespace Game.System
         }
         private void SpawnClient()
         {
-            var playerController = Instantiate(_playerPrefab, _spawnPoints[Random.Range(0, _spawnPoints.Length)].position, Quaternion.Euler(0,Random.value*360,0));
+            var localPlayer = FindObjectOfType<NetworkRunner>().Spawn(_playerPrefab, _spawnPoints[Random.Range(0, _spawnPoints.Length)].position, Quaternion.Euler(0,Random.value*360,0));
   
-            PlayerInput playerInput = playerController.gameObject.AddComponent<PlayerInput>();
+            PlayerInput playerInput = localPlayer.gameObject.AddComponent<PlayerInput>();
 
-            playerController.Setup(playerInput);
+            localPlayer.GetComponent<PlayerController>().Setup(playerInput);
 
-            SystemsManager.GetSystemOfType<CameraSystem>().SetTarget(playerController.transform);
+            SystemsManager.GetSystemOfType<CameraSystem>().SetTarget(localPlayer.transform);
         }
     }
 }
