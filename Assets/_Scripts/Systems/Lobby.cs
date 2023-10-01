@@ -27,11 +27,10 @@ namespace Game.Systems
         [Header("Loading screen"), SerializeField] private CanvasGroup _loadingScreen;
         [SerializeField] private TextMeshProUGUI _loadingScreenText;
 
-        [Header("Prefabs"), SerializeField] private PlayerEntity _playerPrefab;
-        [SerializeField] private NetworkObject _lobbyStatsPrefab;
-
-        NetworkRoomStats _roomStats;
+        [Header("Network prefabs&links"), SerializeField] private NetworkHandler _networkHandler;
+        [SerializeField] private NetworkPrefabRef _lobbyStatsPrefab;
         LobbyStats _lobbyStats;
+        NetworkRunner _networkRunner;
 
         private bool _iAmReadyToPlay;
         private string EMail
@@ -39,7 +38,7 @@ namespace Game.Systems
             get { return PlayerPrefs.GetString("Email"); }
             set { PlayerPrefs.SetString("Email", value); }
         }
-        private string Nickname
+        internal string Nickname
         {
             get { return PlayerPrefs.GetString("Nick"); }
             set { PlayerPrefs.SetString("Nick", value); }
@@ -83,142 +82,63 @@ namespace Game.Systems
             Debug.Log(string.Format("Registered as {0} ({1})", Nickname, EMail));
         }
         #endregion
-
-        public void JoinTheGame()
-        {
-            //SceneManager.LoadScene("Game");
-            GameObject Room = new GameObject("NetworkRoomStats");
-            _roomStats = Room.AddComponent<NetworkRoomStats>();
-            _roomStats.PlayerJoined += OnPlayerJoined;
-            _roomStats.PlayerLeft += OnPlayerLeft;
-            JoinLobby(_roomStats);
-        }
-
-        private void OnDestroy()
-        {
-            if(NetworkRoomStats.Instance != null)
-            {
-                NetworkRoomStats.Instance.PlayerJoined -= OnPlayerJoined;
-                NetworkRoomStats.Instance.PlayerLeft -= OnPlayerLeft;
-            }
-        }
-
-        private async void JoinLobby(NetworkRoomStats room)
+        public void TryToConnectToSession()
         {
             _loadingScreen.gameObject.SetActive(true);
-            await room.Runner.JoinSessionLobby(SessionLobby.Custom, lobbyID: "MainLobby", authentication: new Fusion.Photon.Realtime.AuthenticationValues(Nickname));
-
+            _networkHandler.TryConnect();
+        }
+        public void OnConnectedToSession(NetworkRunner runner)
+        {
+            _networkRunner = runner;
+            if (runner.IsServer)
+            {
+                _lobbyStats = runner.Spawn(_lobbyStatsPrefab, inputAuthority: runner.LocalPlayer).gameObject.GetComponent<LobbyStats>();
+            }
+            //reset players ready text
+            _roomStatusText.text = string.Format("0/{0}", runner.SessionInfo.MaxPlayers);
+        }
+        public void OnLobbyInfoLoaded(LobbyStats lobbyStats)
+        {
+            _lobbyStats = lobbyStats;
             _waitingForPlayersForm.SetActive(true);
-            _roomStatusText.text = string.Format("{0}/{1}", 0, PlayersPerMatch);
+            SubscribeToPlayerReadyButton(_networkRunner, _lobbyStats);
+            _loadingScreen.gameObject.SetActive(false);
         }
-        private void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        public void UpdatePlayersWaitingCounter(NetworkRunner runner, LobbyStats lobbyStats)
         {
-            if (runner.IsServer)
+            int requiredPlayersCount = runner.SessionInfo.MaxPlayers;
+            _roomStatusText.text = string.Format("{0}/{1}", lobbyStats.ReadyPlayersCount, requiredPlayersCount);
+        }
+        private void SubscribeToPlayerReadyButton(NetworkRunner runner, LobbyStats lobbyStats)
+        {
+            _playerReadyButton.onClick.AddListener(() =>
             {
-                _lobbyStats = runner.Spawn(_lobbyStatsPrefab).GetComponent<LobbyStats>();
-                var newPlayer = runner.Spawn(_playerPrefab, inputAuthority: player);
-                Debug.Log("sending rpc call...");
-                //RPC_PlayerEntitySpawned(player, player.PlayerId);
-                //RPC_StaticCall(runner, player, newPlayer.Object);
-            }
-            else
-            {
-                _lobbyStats = FindObjectOfType<LobbyStats>();
-            }
-            if (player == runner.LocalPlayer)//if spawning self player
-            {
-                _loadingScreen.gameObject.SetActive(false);
-                _playerReadyButton.onClick.AddListener(() =>
+                if (_iAmReadyToPlay)
                 {
-                    if(_iAmReadyToPlay)
-                    {
-                        _iAmReadyToPlay = false;
-                        _playerReadyButtonText.text = "Not ready";
-                        _playerReadyButton.targetGraphic.color = Color.white;
-                        RPC_PlayerIsNotReady();
-                    }
-                    else
-                    {
-                        _iAmReadyToPlay = true;
-                        _playerReadyButtonText.text = "Ready";
-                        _playerReadyButton.targetGraphic.color = _playerReadyButtonColor;
-                        RPC_PlayerIsReady();
-                    }
-                });
-            }
-            Debug.Log("player joined (lobby)");
-        }
-
-        [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
-        public  void RPC_PlayerEntitySpawned([RpcTarget] PlayerRef playerRef, int spawnedPlayerID)
-        {
-            Debug.Log(string.Format("Player {0} is spawned.", spawnedPlayerID));
-            if (_roomStats.Runner.LocalPlayer == spawnedPlayerID)
-            {
-                var playerEntity = _roomStats.Runner.GetPlayerObject(spawnedPlayerID);
-                if (playerEntity != null)
-                    playerEntity.GetComponent<PlayerEntity>().Name = Nickname;
-                else 
-                    Debug.LogWarning("No player object registered!");
-            }
-        }
-        [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
-        public static void RPC_StaticCall(NetworkRunner runner, PlayerRef player, NetworkObject playerNetworkObject)
-        {
-            Debug.Log(string.Format("{0} is spawned.", player));
-            runner.SetPlayerObject(player, playerNetworkObject);
-
-            if (runner.LocalPlayer == player)
-            {
-                foreach (var p in runner.ActivePlayers)
-                {
-                    Debug.Log(string.Format("For player {0} body exist: {1}", p.PlayerId, runner.GetPlayerObject(p) != null));
+                    _iAmReadyToPlay = false;
+                    _playerReadyButtonText.text = "Not ready";
+                    _playerReadyButton.targetGraphic.color = Color.white;
+                    lobbyStats.RPC_PlayerIsNotReady(runner.LocalPlayer);
                 }
-                var playerEntity = runner.GetPlayerObject(player);
-                if (playerEntity != null)
-                    playerEntity.GetComponent<PlayerEntity>().Name = PlayerPrefs.GetString("Nick");
                 else
-                    Debug.LogWarning("No player object registered!");
-            }
-        }
-
-
-        [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
-        public void RPC_PlayerIsReady()
-        {
-            if (_roomStats.Runner.IsServer)
-                _lobbyStats.ReadyPlayersCount++;
-            Debug.Log(string.Format("Some player is ready {0}/{1}", _lobbyStats.ReadyPlayersCount, _roomStats.Runner.SessionInfo.PlayerCount));
-            TryStartGame();
-        }
-        [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
-        public void RPC_PlayerIsNotReady()
-        {
-            if (_roomStats.Runner.IsServer)
-                _lobbyStats.ReadyPlayersCount--;
-            Debug.Log(string.Format("Some player is not ready {0}/{1}", _lobbyStats.ReadyPlayersCount, _roomStats.Runner.SessionInfo.PlayerCount));
-            TryStartGame();
-        }
-        private void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-        {
-            if (runner.IsServer)
-            {
-                runner.Despawn(runner.GetPlayerObject(player));
-                TryStartGame();
-                Debug.Log((runner.SessionInfo.PlayerCount - 1)+ " players from " + runner.SessionInfo.MaxPlayers);
-                if (runner.SessionInfo.PlayerCount - 1 < runner.SessionInfo.MaxPlayers)
                 {
-                    runner.SessionInfo.IsVisible = true;
-                    Debug.Log("Session is not full");
+                    _iAmReadyToPlay = true;
+                    _playerReadyButtonText.text = "Ready";
+                    _playerReadyButton.targetGraphic.color = _playerReadyButtonColor;
+                    lobbyStats.RPC_PlayerIsReady(runner.LocalPlayer);
                 }
-            }
+            });
         }
-        private void TryStartGame()
-        {
-            int requiredPlayersCount = NetworkRoomStats.Instance.Runner.SessionInfo.MaxPlayers;
-            _roomStatusText.text = string.Format("{0}/{1}", _lobbyStats.ReadyPlayersCount, requiredPlayersCount);
 
-            if (_lobbyStats.ReadyPlayersCount >= requiredPlayersCount)
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
+        }
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        {
+        }
+        public void TryStartGame(NetworkRunner runner, LobbyStats lobbyStats)
+        {
+            if (lobbyStats.ReadyPlayersCount >= runner.SessionInfo.MaxPlayers)
             {
                 StartCoroutine(LoadScene());
             }

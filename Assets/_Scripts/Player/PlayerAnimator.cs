@@ -13,12 +13,7 @@ namespace Game.Player
         private bool _executingHitAnimation;
         private Coroutine _executingHitCoroutine;
 
-        public void Setup(IPlayerInput playerInput)
-        {
-            playerInput.OnTryHit += TryHit;
-        }
-
-        private void TryHit()
+        internal void TryHit()
         {
             if (!_executingHitAnimation && _characterController.velocity.sqrMagnitude < 0.1f)
             {
