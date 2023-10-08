@@ -15,16 +15,19 @@ namespace Game.Systems
         private void Awake()
         {
             _lobby = FindObjectOfType<Lobby>();
-            _lobby.OnLobbyInfoLoaded(this);
+            if (_lobby != null)
+                _lobby.OnLobbyInfoLoaded(this);
+            else
+                Debug.LogWarning("No lobby found!");
         }
 
-        [Rpc(sources: RpcSources.All, targets: RpcTargets.InputAuthority)]
+        [Rpc(sources: RpcSources.All, targets: RpcTargets.StateAuthority)]
         public void RPC_PlayerIsReady(PlayerRef player)
         {
             ReadyPlayersCount++; 
         }
 
-        [Rpc(sources: RpcSources.All, targets: RpcTargets.InputAuthority)]
+        [Rpc(sources: RpcSources.All, targets: RpcTargets.StateAuthority)]
         public void RPC_PlayerIsNotReady(PlayerRef player)
         {
             ReadyPlayersCount--;

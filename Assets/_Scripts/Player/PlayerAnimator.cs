@@ -7,15 +7,19 @@ namespace Game.Player
 {
     public class PlayerAnimator : MonoBehaviour
     {
-        [SerializeField] private CharacterController _characterController;
         [SerializeField] private Animator _animator;
         private float _velocity;
         private bool _executingHitAnimation;
         private Coroutine _executingHitCoroutine;
+        private PlayerController _playerController;
 
-        internal void TryHit()
+        internal void Setup(PlayerController controller)
         {
-            if (!_executingHitAnimation && _characterController.velocity.sqrMagnitude < 0.1f)
+            _playerController = controller;
+        }
+        private void TryHit()
+        {
+            if (!_executingHitAnimation && _playerController.Velocity.sqrMagnitude < 0.1f)
             {
                 _animator.SetTrigger("attack");
                 _executingHitAnimation = true;
@@ -25,7 +29,7 @@ namespace Game.Player
 
         private void Update()
         {
-            _velocity = _characterController.velocity.sqrMagnitude;
+            _velocity = _playerController.Velocity.sqrMagnitude;
             _animator.SetFloat("velocity", _velocity);
             if (_velocity > 0.1f && _executingHitCoroutine != null)
             {
@@ -33,6 +37,9 @@ namespace Game.Player
                 _executingHitCoroutine = null;
                 _executingHitAnimation = false;
             }
+
+            if(_playerController.WantToHit)
+                TryHit();
         }
 
         public void FootR()

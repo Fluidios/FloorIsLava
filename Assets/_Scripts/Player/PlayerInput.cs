@@ -10,7 +10,7 @@ using NaughtyAttributes;
 
 namespace Game.Player
 {
-    public class PlayerInput : MonoBehaviour, INetworkRunnerCallbacks/*, IPlayerInput*/
+    public class PlayerInput : MonoBehaviour, INetworkRunnerCallbacks
     {
         private Controls _controls;
         [SerializeField, ReadOnly] private Camera _camera;
@@ -31,7 +31,7 @@ namespace Game.Player
                     _inputVector = _controls.Default.Move.ReadValue<Vector2>();
 
                     _moveVector = _camera.transform.right * _inputVector.x + _camera.transform.forward * _inputVector.y;
-                    _moveVector.y = 0;
+                    _moveVector.y = _controls.Default.Jump.triggered ? 1 : 0;
 
                     return _moveVector;
                 }
@@ -44,6 +44,7 @@ namespace Game.Player
             _controls = Controls.Instance;
 
             _controls.Default.LClick.performed += (ctx) => { _mouseButton0 = true; };
+            _controls.Default.RClick.performed += (ctx) => { _mouseButton1 = true; };
 
         }
 

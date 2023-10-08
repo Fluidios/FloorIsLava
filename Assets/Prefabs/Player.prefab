@@ -1000,7 +1000,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb3fbac9974109048b45942aa9f2ebff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _characterController: {fileID: 4018424808887691674}
   _animator: {fileID: 3580046118599246728}
 --- !u!114 &1845958513617349430
 MonoBehaviour:
@@ -1071,10 +1070,10 @@ MonoBehaviour:
   TargetInterpolationDelay: 0.03
   gravity: -20
   jumpImpulse: 8
-  acceleration: 5
-  braking: 10
-  maxSpeed: 5
-  rotationSpeed: 25
+  acceleration: 25
+  braking: 25
+  maxSpeed: 4
+  rotationSpeed: 30
   _IsGrounded: 0
   _Velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &7943453507171332500
@@ -1091,6 +1090,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _playerAnimator: {fileID: 3804768120375710454}
+  _Velocity: {x: 0, y: 0, z: 0}
+  _WantToHit: 0
 --- !u!1 &5984261126660522158
 GameObject:
   m_ObjectHideFlags: 0

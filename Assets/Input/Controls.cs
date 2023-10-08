@@ -46,6 +46,24 @@ namespace Game.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""b30f9f67-72c2-452a-b5a5-3c0513cedb2d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""6b0b8aac-f4aa-4637-bd76-04b25086bf01"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -114,6 +132,28 @@ namespace Game.Input
                     ""action"": ""LClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c0eb959a-0a59-4c8b-97fe-29cac48f4798"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8bd77b95-888b-4178-8677-0c77d35460d5"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -124,6 +164,8 @@ namespace Game.Input
             m_Default = asset.FindActionMap("Default", throwIfNotFound: true);
             m_Default_Move = m_Default.FindAction("Move", throwIfNotFound: true);
             m_Default_LClick = m_Default.FindAction("LClick", throwIfNotFound: true);
+            m_Default_RClick = m_Default.FindAction("RClick", throwIfNotFound: true);
+            m_Default_Jump = m_Default.FindAction("Jump", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -187,12 +229,16 @@ namespace Game.Input
         private List<IDefaultActions> m_DefaultActionsCallbackInterfaces = new List<IDefaultActions>();
         private readonly InputAction m_Default_Move;
         private readonly InputAction m_Default_LClick;
+        private readonly InputAction m_Default_RClick;
+        private readonly InputAction m_Default_Jump;
         public struct DefaultActions
         {
             private @Controls m_Wrapper;
             public DefaultActions(@Controls wrapper) { m_Wrapper = wrapper; }
             public InputAction @Move => m_Wrapper.m_Default_Move;
             public InputAction @LClick => m_Wrapper.m_Default_LClick;
+            public InputAction @RClick => m_Wrapper.m_Default_RClick;
+            public InputAction @Jump => m_Wrapper.m_Default_Jump;
             public InputActionMap Get() { return m_Wrapper.m_Default; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -208,6 +254,12 @@ namespace Game.Input
                 @LClick.started += instance.OnLClick;
                 @LClick.performed += instance.OnLClick;
                 @LClick.canceled += instance.OnLClick;
+                @RClick.started += instance.OnRClick;
+                @RClick.performed += instance.OnRClick;
+                @RClick.canceled += instance.OnRClick;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
             }
 
             private void UnregisterCallbacks(IDefaultActions instance)
@@ -218,6 +270,12 @@ namespace Game.Input
                 @LClick.started -= instance.OnLClick;
                 @LClick.performed -= instance.OnLClick;
                 @LClick.canceled -= instance.OnLClick;
+                @RClick.started -= instance.OnRClick;
+                @RClick.performed -= instance.OnRClick;
+                @RClick.canceled -= instance.OnRClick;
+                @Jump.started -= instance.OnJump;
+                @Jump.performed -= instance.OnJump;
+                @Jump.canceled -= instance.OnJump;
             }
 
             public void RemoveCallbacks(IDefaultActions instance)
@@ -239,6 +297,8 @@ namespace Game.Input
         {
             void OnMove(InputAction.CallbackContext context);
             void OnLClick(InputAction.CallbackContext context);
+            void OnRClick(InputAction.CallbackContext context);
+            void OnJump(InputAction.CallbackContext context);
         }
     }
 }

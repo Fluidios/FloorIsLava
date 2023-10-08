@@ -14,20 +14,30 @@ namespace Game.Player
         [SerializeField] private PlayerAnimator _playerAnimator;
         private NetworkCharacterControllerPrototype _networkCharacterController;
 
+        [Networked]
+        public Vector3 Velocity { get; set; }
+        [Networked]
+        public bool WantToHit { get; set; }
+
         private void Awake()
         {
             _networkCharacterController = GetComponent<NetworkCharacterControllerPrototype>();
+            _playerAnimator.Setup(this);
         }
         public override void FixedUpdateNetwork()
         {
             if (GetInput(out NetworkInputData data))
             {
                 var direction = data.direction.normalized;
-                _networkCharacterController.Move(direction*Time.fixedDeltaTime);
-
+                _networkCharacterController.Move(direction);
+                Velocity = _networkCharacterController.Velocity;
                 if ((data.buttons & NetworkInputData.MouseButton0) != 0)
                 {
-                    _playerAnimator.TryHit();
+                    WantToHit = true;
+                }
+                else if(WantToHit)
+                {
+                    WantToHit = false;
                 }
 
                 //if (direction.sqrMagnitude > 0)
