@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,9 +7,8 @@ namespace Game.Player
     public class PlayerAnimator : MonoBehaviour
     {
         [SerializeField] private Animator _animator;
-        private float _velocity;
-        private bool _executingHitAnimation;
-        private Coroutine _executingHitCoroutine;
+        [SerializeField] private ParticleSystem _jumpParticles;
+        private Vector3 _velocity;
         private PlayerController _playerController;
 
         internal void Setup(PlayerController controller)
@@ -19,45 +17,24 @@ namespace Game.Player
         }
         private void TryHit()
         {
-            if (!_executingHitAnimation && _playerController.Velocity.sqrMagnitude < 0.1f)
-            {
-                _animator.SetTrigger("attack");
-                _executingHitAnimation = true;
-                _executingHitCoroutine = StartCoroutine(DoWithDelay(_animator.GetCurrentAnimatorStateInfo(0).length, () => _executingHitAnimation = false));
-            }
+            _animator.SetInteger("attackVar", Random.Range(0, 3));
+            _animator.SetTrigger("attack");
+        }
+        private void TryJump()
+        {
+            _animator.SetTrigger("jump");
+            _jumpParticles.Play();
         }
 
         private void Update()
         {
-            _velocity = _playerController.Velocity.sqrMagnitude;
-            _animator.SetFloat("velocity", _velocity);
-            if (_velocity > 0.1f && _executingHitCoroutine != null)
-            {
-                StopCoroutine(_executingHitCoroutine);
-                _executingHitCoroutine = null;
-                _executingHitAnimation = false;
-            }
-
-            if(_playerController.WantToHit)
+            _velocity = _playerController.Velocity;
+            _velocity.y = 0;
+            _animator.SetFloat("velocity", _velocity.sqrMagnitude);
+            if(_playerController.WantToHit) 
                 TryHit();
-        }
-
-        public void FootR()
-        {
-
-        }
-        public void FootL()
-        {
-
-        }
-        public void Hit()
-        {
-
-        }
-        IEnumerator DoWithDelay(float delay, Action action)
-        {
-            yield return new WaitForSeconds(delay);
-            action();
+            if (_playerController.WantToJump)
+                TryJump();
         }
     }
 }

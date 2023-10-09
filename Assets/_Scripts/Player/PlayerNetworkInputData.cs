@@ -9,6 +9,7 @@ namespace Game.Player
     {
         public const byte MouseButton0 = 0x01;
         public const byte MouseButton1 = 0x02;
+        public const byte JumpCode = 0x10;
 
         public byte buttons;
         public Vector3 direction;

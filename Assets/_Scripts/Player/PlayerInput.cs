@@ -19,6 +19,7 @@ namespace Game.Player
         private Quaternion _targetRotation;
         private bool _mouseButton0;
         private bool _mouseButton1;
+        private bool _jumpButton;
         private Vector3 CameraDependentMoveVector
         {
             get
@@ -31,11 +32,22 @@ namespace Game.Player
                     _inputVector = _controls.Default.Move.ReadValue<Vector2>();
 
                     _moveVector = _camera.transform.right * _inputVector.x + _camera.transform.forward * _inputVector.y;
-                    _moveVector.y = _controls.Default.Jump.triggered ? 1 : 0;
+                    _moveVector.y = 0;
 
                     return _moveVector;
                 }
                 return Vector3.zero;
+            }
+        }
+        private Vector3 CameraForward
+        {
+            get
+            {
+                if (_camera == null)
+                    _camera = Camera.main;
+                var v = _camera.transform.forward;
+                v.y = 0;
+                return v;
             }
         }
 
@@ -45,7 +57,7 @@ namespace Game.Player
 
             _controls.Default.LClick.performed += (ctx) => { _mouseButton0 = true; };
             _controls.Default.RClick.performed += (ctx) => { _mouseButton1 = true; };
-
+            _controls.Default.Jump.performed += (ctx) => { _jumpButton = true; };
         }
 
         private void Update()
@@ -60,12 +72,19 @@ namespace Game.Player
             data.direction = CameraDependentMoveVector;
 
             if (_mouseButton0)
+            {
                 data.buttons |= NetworkInputData.MouseButton0;
+                data.direction = CameraForward;
+            }
             _mouseButton0 = false;
 
             if (_mouseButton1)
                 data.buttons |= NetworkInputData.MouseButton1;
             _mouseButton1 = false;
+
+            if (_jumpButton)
+                data.buttons |= NetworkInputData.JumpCode;
+            _jumpButton = false;
 
             input.Set(data);
         }
