@@ -12,44 +12,41 @@ namespace Game.Player
     public class PlayerController : NetworkBehaviour
     {
         [SerializeField] private PlayerAnimator _playerAnimator;
+        [SerializeField] private Pusher _pusher;
+        [SerializeField] private DynamicBody _dynamicBody;
         private NetworkCharacterControllerPrototype _networkCharacterController;
 
         [Networked]
         public Vector3 Velocity { get; set; }
-        [Networked]
-        public bool WantToJump { get; set; }
-        [Networked]
-        public bool WantToHit { get; set; }
+        private bool _isPushedAndFalling;
 
         private void Awake()
         {
             _networkCharacterController = GetComponent<NetworkCharacterControllerPrototype>();
             _playerAnimator.Setup(this);
+            _pusher.Setup(this);
+            _dynamicBody.Setup(this);
         }
         public override void FixedUpdateNetwork()
         {
+            if (_isPushedAndFalling)
+            {
+                _networkCharacterController.Move(Vector3.zero);
+                return;
+            }
             if (GetInput(out NetworkInputData data))
             {
                 var direction = data.direction.normalized;
-                _networkCharacterController.Move(direction); 
+                _networkCharacterController.Move(direction);
                 if ((data.buttons & NetworkInputData.MouseButton0) != 0)
                 {
                     _networkCharacterController.TeleportToRotation(Quaternion.LookRotation(direction));
-                    WantToHit = true;
+                    if (Object.HasInputAuthority) RPC_HandleHit();
                 }
-                else if(WantToHit)
+                if ((data.buttons & NetworkInputData.JumpCode) != 0 && _networkCharacterController.IsGrounded)
                 {
-                    WantToHit = false;
-                }
-                if((data.buttons & NetworkInputData.JumpCode) != 0 && _networkCharacterController.IsGrounded)
-                {
-                    _networkCharacterController.Velocity += transform.forward * 10;
                     _networkCharacterController.Jump();
-                    WantToJump = true;
-                }
-                else if(WantToJump)
-                {
-                    WantToJump = false;
+                    if(Object.HasInputAuthority) RPC_HandleJump();
                 }
                 if ((data.buttons & NetworkInputData.MouseButton1) != 0)
                 {
@@ -91,7 +88,32 @@ namespace Game.Player
 
         public void Hit()
         {
-            Debug.Log("Hit");
+            if(Runner.IsServer)
+                _pusher.TryPushWithHit();
+        }
+        [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
+        internal void RPC_HandleHit()
+        {
+            Debug.Log("H");
+            _playerAnimator.TryHit();
+        }
+        [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
+        internal void RPC_HandleJump()
+        {
+            Debug.Log("J");
+            _playerAnimator.TryJump();
+        }
+        internal void HandleFall()
+        { 
+            Debug.Log("F");
+            _playerAnimator.TryFall(()=>_isPushedAndFalling = false);
+        }
+        [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
+        internal void RPC_OnBeingPushed(Vector3 pushPower)
+        {
+            _networkCharacterController.TeleportToRotation(Quaternion.LookRotation(-pushPower));
+            _isPushedAndFalling = true;
+            HandleFall();
         }
     }
 

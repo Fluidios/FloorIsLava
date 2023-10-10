@@ -21,9 +21,9 @@ namespace Game.System
             _networkHandler.OnPlayerJoinedToCurrentSession.AddListener(OnPlayerJoined);
             _networkHandler.OnPlayerLeftCurrentSession.AddListener(OnPlayerLeft);
 
-            SpawnClient();
+            SpawnClients();
         }
-        private void SpawnClient()
+        private void SpawnClients()
         {
             var runner = FindObjectOfType<NetworkRunner>();
 

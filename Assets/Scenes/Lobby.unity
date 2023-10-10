@@ -2998,7 +2998,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lobby: {fileID: 2143074340}
-  _sessionsSize: 1
+  _sessionsSize: 2
   OnConnectedToSession:
     m_PersistentCalls:
       m_Calls:
