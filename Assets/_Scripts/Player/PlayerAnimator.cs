@@ -26,10 +26,12 @@ namespace Game.Player
             _animator.SetTrigger("jump");
             _jumpParticles.Play();
         }
-        internal void TryFall(Action onEndFall)
+        internal float TryFall(Action onEndFall)
         {
             _animator.SetTrigger("fall");
-            StartCoroutine(DoWithDelay(_animator.GetCurrentAnimatorStateInfo(0).length, onEndFall));
+            float fallLength = _animator.GetCurrentAnimatorStateInfo(0).length;
+            StartCoroutine(DoWithDelay(fallLength, onEndFall));
+            return fallLength;
         }
 
         private void Update()

@@ -19,14 +19,14 @@ namespace Game.Player
         internal void Setup(PlayerController playerController)
         {
             _playerController = playerController;
-        }    
+        }
 
-        private void FixedUpdate()
+        public override void FixedUpdateNetwork()
         {
             if (Runner.IsServer)
             {
                 _didHit = Runner.LagCompensation.Raycast(_playerCenterPoint.position, transform.forward, _pushRayLength, Object.InputAuthority, out _hit, _regularPushLayerMask, HitOptions.IncludePhysX);
-                Debug.DrawRay(_playerCenterPoint.position, _playerCenterPoint.forward*_pushRayLength, _didHit ? Color.red : Color.white);
+                Debug.DrawRay(_playerCenterPoint.position, _playerCenterPoint.forward * _pushRayLength, _didHit ? Color.red : Color.white);
                 if (_didHit && _hit.Hitbox != null)
                 {
                     _hit.Hitbox.transform.root.GetComponent<DynamicBody>().Push((_hit.Point - _playerCenterPoint.position).normalized * Mathf.Clamp(_playerController.Velocity.sqrMagnitude, 0, _walkingPushLimit));
@@ -46,7 +46,7 @@ namespace Game.Player
                 {
                     Debug.Log(2);
                     Debug.Log(Runner.LocalPlayer + ": is pushing.");
-                    _hit.Hitbox.transform.root.GetComponent<DynamicBody>().Push((_hit.Point - _playerCenterPoint.position).normalized * _pushPower, true);
+                    _hit.Hitbox.transform.root.GetComponent<DynamicBody>().Push(Vector3.up * 10 + (_hit.Point - _playerCenterPoint.position).normalized * _pushPower, true);
                 }
                 else if (_hit.Collider != null)
                 {

@@ -14,11 +14,13 @@ namespace Game.Player
         [SerializeField] private PlayerAnimator _playerAnimator;
         [SerializeField] private Pusher _pusher;
         [SerializeField] private DynamicBody _dynamicBody;
+        [SerializeField] private Stamina _stamina;
         private NetworkCharacterControllerPrototype _networkCharacterController;
 
         [Networked]
         public Vector3 Velocity { get; set; }
         private bool _isPushedAndFalling;
+        private Vector3 _currentPushVelocity;
 
         private void Awake()
         {
@@ -31,7 +33,7 @@ namespace Game.Player
         {
             if (_isPushedAndFalling)
             {
-                _networkCharacterController.Move(Vector3.zero);
+                _networkCharacterController.Move(_currentPushVelocity);
                 return;
             }
             if (GetInput(out NetworkInputData data))
@@ -40,48 +42,24 @@ namespace Game.Player
                 _networkCharacterController.Move(direction);
                 if ((data.buttons & NetworkInputData.MouseButton0) != 0)
                 {
-                    _networkCharacterController.TeleportToRotation(Quaternion.LookRotation(direction));
-                    if (Object.HasInputAuthority) RPC_HandleHit();
+                    if (_stamina.TryHit())
+                    {
+                        _networkCharacterController.TeleportToRotation(Quaternion.LookRotation(direction));
+                        if (Object.HasInputAuthority) RPC_HandleHit();
+                    }
                 }
                 if ((data.buttons & NetworkInputData.JumpCode) != 0 && _networkCharacterController.IsGrounded)
                 {
-                    _networkCharacterController.Jump();
-                    if(Object.HasInputAuthority) RPC_HandleJump();
+                    if (_stamina.TryJump())
+                    {
+                        _networkCharacterController.Jump();
+                        if (Object.HasInputAuthority) RPC_HandleJump();
+                    }
                 }
                 if ((data.buttons & NetworkInputData.MouseButton1) != 0)
                 {
                     Debug.Log("RMC");
                 }
-
-                //if (direction.sqrMagnitude > 0)
-                //    _forward = direction;
-
-                //if (delay.ExpiredOrNotRunning(Runner))
-                //{
-                //    delay = TickTimer.CreateFromSeconds(Runner, _shootDelay);
-
-                //    if ((data.buttons & NetworkInputData.MouseButton0) != 0)
-                //    {
-                //        Runner.Spawn(
-                //            prefab: _bulletPrefab,
-                //            position: transform.position + _forward,
-                //            rotation: Quaternion.LookRotation(_forward),
-                //            inputAuthority: Object.InputAuthority,
-                //            onBeforeSpawned: (_, networkObject) => { networkObject.GetComponent<Bullet>().Init(); }
-                //        );
-                //    }
-                //    else if ((data.buttons & NetworkInputData.MouseButton1) != 0)
-                //    {
-                //        Runner.Spawn(
-                //            prefab: _bombPrefab,
-                //            position: transform.position + _forward,
-                //            rotation: Quaternion.LookRotation(_forward),
-                //            inputAuthority: Object.InputAuthority,
-                //            onBeforeSpawned: (_, networkObject) => { networkObject.GetComponent<Bomb>().Init(_force); }
-                //        );
-                //        bombSpawned = !bombSpawned;
-                //    }
-                //}
             }
             Velocity = _networkCharacterController.Velocity;
         }
@@ -94,26 +72,36 @@ namespace Game.Player
         [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
         internal void RPC_HandleHit()
         {
-            Debug.Log("H");
             _playerAnimator.TryHit();
         }
         [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
         internal void RPC_HandleJump()
         {
-            Debug.Log("J");
             _playerAnimator.TryJump();
         }
-        internal void HandleFall()
+        internal float HandleFall()
         { 
             Debug.Log("F");
-            _playerAnimator.TryFall(()=>_isPushedAndFalling = false);
+            return _playerAnimator.TryFall(()=>_isPushedAndFalling = false);
         }
         [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
         internal void RPC_OnBeingPushed(Vector3 pushPower)
         {
             _networkCharacterController.TeleportToRotation(Quaternion.LookRotation(-pushPower));
             _isPushedAndFalling = true;
-            HandleFall();
+            StartCoroutine(SimulateFallVelocity(HandleFall(), pushPower));
+        }
+
+        IEnumerator SimulateFallVelocity(float fallLengthTime, Vector3 fallStartVelocity)
+        {
+            float totalTime = fallLengthTime;
+            while(fallLengthTime > 0)
+            {
+                if (!_isPushedAndFalling) break;
+                fallLengthTime -= fallLengthTime * Time.deltaTime * 10;
+                _currentPushVelocity = fallStartVelocity * (fallLengthTime/totalTime);
+                yield return null;
+            } 
         }
     }
 

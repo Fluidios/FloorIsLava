@@ -5807,6 +5807,7 @@ GameObject:
   - component: {fileID: 8511570622298309241}
   - component: {fileID: -2668702902326807483}
   - component: {fileID: 5181853734477015736}
+  - component: {fileID: 4409842930590042701}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -5875,7 +5876,7 @@ CharacterController:
   serializedVersion: 3
   m_Height: 1.2
   m_Radius: 0.2
-  m_SlopeLimit: 45
+  m_SlopeLimit: 50
   m_StepOffset: 0.5
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
@@ -5922,6 +5923,7 @@ MonoBehaviour:
   - {fileID: 8511570622298309241}
   - {fileID: -2668702902326807483}
   - {fileID: 5181853734477015736}
+  - {fileID: 4409842930590042701}
   SimulationBehaviours: []
 --- !u!114 &-5292610967942018083
 MonoBehaviour:
@@ -5988,10 +5990,8 @@ MonoBehaviour:
   _playerAnimator: {fileID: 3804768120375710454}
   _pusher: {fileID: 8511570622298309241}
   _dynamicBody: {fileID: -2668702902326807483}
+  _stamina: {fileID: 4409842930590042701}
   _Velocity: {x: 0, y: 0, z: 0}
-  _WantToJump: 0
-  _WantToHit: 0
-  _BeingPushed: 0
 --- !u!114 &8511570622298309241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6010,7 +6010,7 @@ MonoBehaviour:
   _regularPushLayerMask:
     serializedVersion: 2
     m_Bits: 8
-  _pushPower: 100
+  _pushPower: 15
 --- !u!114 &-2668702902326807483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6045,6 +6045,20 @@ MonoBehaviour:
   GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   Hitboxes:
   - {fileID: 0}
+--- !u!114 &4409842930590042701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5767941750691822340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e309763ac7f057547a48a11e43cd2c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _CurrentStamina: 0
 --- !u!1 &5984261126660522158
 GameObject:
   m_ObjectHideFlags: 0
