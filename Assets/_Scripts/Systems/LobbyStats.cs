@@ -40,8 +40,11 @@ namespace Game.Systems
                 _localReadyPLayersCount = ReadyPlayersCount;
                 Debug.Log(string.Format("Ready players count = {0}/{1}",_localReadyPLayersCount, Runner.SessionInfo.MaxPlayers));
 
-                _lobby.UpdatePlayersWaitingCounter(Runner, this);
-                _lobby.TryStartGame(Runner, this);
+                if(_lobby != null)
+                {
+                    _lobby.UpdatePlayersWaitingCounter(Runner, this);
+                    _lobby.TryStartGame(Runner, this);
+                }
             }
         }
     }

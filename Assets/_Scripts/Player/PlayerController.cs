@@ -19,6 +19,8 @@ namespace Game.Player
 
         [Networked]
         public Vector3 Velocity { get; set; }
+        public bool IsGrounded => _networkCharacterController.IsGrounded;
+        public NetworkCharacterControllerPrototype Controller => _networkCharacterController;
         private bool _isPushedAndFalling;
         private Vector3 _currentPushVelocity;
 
@@ -33,7 +35,8 @@ namespace Game.Player
         {
             if (_isPushedAndFalling)
             {
-                _networkCharacterController.Move(_currentPushVelocity);
+                _networkCharacterController.Velocity = _currentPushVelocity + Physics.gravity;
+                _networkCharacterController.Move(Vector3.zero);
                 return;
             }
             if (GetInput(out NetworkInputData data))
@@ -42,7 +45,7 @@ namespace Game.Player
                 _networkCharacterController.Move(direction);
                 if ((data.buttons & NetworkInputData.MouseButton0) != 0)
                 {
-                    if (_stamina.TryHit())
+                    if (_stamina.EnoughToHit())
                     {
                         _networkCharacterController.TeleportToRotation(Quaternion.LookRotation(direction));
                         if (Object.HasInputAuthority) RPC_HandleHit();
@@ -66,8 +69,11 @@ namespace Game.Player
 
         public void Hit()
         {
-            if(Runner.IsServer)
+            if (Runner.IsServer)
+            {
+                _stamina.SpendOnHit();
                 _pusher.TryPushWithHit();
+            }
         }
         [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
         internal void RPC_HandleHit()
@@ -81,14 +87,24 @@ namespace Game.Player
         }
         internal float HandleFall()
         { 
-            Debug.Log("F");
-            return _playerAnimator.TryFall(()=>_isPushedAndFalling = false);
+            return _playerAnimator.TryFall(()=>
+            {
+                _isPushedAndFalling = false;
+            });
+        }
+        [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
+        internal void RPC_OnHitSomething()
+        {
+            _playerAnimator.OnHitSomething();
         }
         [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
         internal void RPC_OnBeingPushed(Vector3 pushPower)
         {
-            _networkCharacterController.TeleportToRotation(Quaternion.LookRotation(-pushPower));
+            Vector3 lookDir = -pushPower;
+            lookDir.y = 0;
+            _networkCharacterController.TeleportToRotation(Quaternion.LookRotation(lookDir));
             _isPushedAndFalling = true;
+            pushPower.y *= 2;
             StartCoroutine(SimulateFallVelocity(HandleFall(), pushPower));
         }
 
@@ -98,7 +114,7 @@ namespace Game.Player
             while(fallLengthTime > 0)
             {
                 if (!_isPushedAndFalling) break;
-                fallLengthTime -= fallLengthTime * Time.deltaTime * 10;
+                fallLengthTime -= fallLengthTime * Time.deltaTime;
                 _currentPushVelocity = fallStartVelocity * (fallLengthTime/totalTime);
                 yield return null;
             } 

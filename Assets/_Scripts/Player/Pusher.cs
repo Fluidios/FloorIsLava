@@ -8,11 +8,13 @@ namespace Game.Player
     public class Pusher : NetworkBehaviour
     {
         private const float _walkingPushLimit = 0.75f;
+        [SerializeField] private bool _continuousPushing;
         [SerializeField] private Transform _playerCenterPoint;
         [SerializeField] private float _pushRayLength = 1;
         [SerializeField] private LayerMask _regularPushLayerMask;
         [SerializeField] private float _pushPower = 10;
         private bool _didHit;
+        private List<LagCompensatedHit> _hits = new List<LagCompensatedHit>();
         private LagCompensatedHit _hit;
         private PlayerController _playerController;
 
@@ -23,7 +25,7 @@ namespace Game.Player
 
         public override void FixedUpdateNetwork()
         {
-            if (Runner.IsServer)
+            if (_continuousPushing && Runner.IsServer)
             {
                 _didHit = Runner.LagCompensation.Raycast(_playerCenterPoint.position, transform.forward, _pushRayLength, Object.InputAuthority, out _hit, _regularPushLayerMask, HitOptions.IncludePhysX);
                 Debug.DrawRay(_playerCenterPoint.position, _playerCenterPoint.forward * _pushRayLength, _didHit ? Color.red : Color.white);
@@ -37,23 +39,24 @@ namespace Game.Player
         public void TryPushWithHit()
         {
             if (!Runner.IsServer) return;
-            _didHit = Runner.LagCompensation.Raycast(_playerCenterPoint.position, transform.forward, _pushRayLength*2, Object.InputAuthority, out _hit, _regularPushLayerMask, HitOptions.IncludePhysX);
+            
+            _didHit = Runner.LagCompensation.OverlapSphere(_playerCenterPoint.position, 0.4f, Object.InputAuthority, _hits, _regularPushLayerMask, HitOptions.IncludePhysX) > 1;
+            //_didHit = Runner.LagCompensation.Raycast(_playerCenterPoint.position, transform.forward, _pushRayLength*2, Object.InputAuthority, out _hit, _regularPushLayerMask, HitOptions.IncludePhysX);
 
-            Debug.Log(1);
             if (_didHit)
             {
-                if (_hit.Hitbox != null)
+                foreach (var hit in _hits)
                 {
-                    Debug.Log(2);
-                    Debug.Log(Runner.LocalPlayer + ": is pushing.");
-                    _hit.Hitbox.transform.root.GetComponent<DynamicBody>().Push(Vector3.up * 10 + (_hit.Point - _playerCenterPoint.position).normalized * _pushPower, true);
-                }
-                else if (_hit.Collider != null)
-                {
-
-                    Debug.Log(4);
-
-                    //do nothing if we hit something static
+                    if (hit.Hitbox != null)
+                    {
+                        if (hit.Hitbox.transform.root == transform) continue;
+                        hit.Hitbox.transform.root.GetComponent<DynamicBody>().Push(Vector3.up * 10 + (hit.Point - _playerCenterPoint.position).normalized * _pushPower, true);
+                        _playerController.RPC_OnHitSomething();
+                    }
+                    else if (hit.Collider != null) 
+                    {
+                        //do nothing if we hit something static
+                    }
                 }
             }
         }

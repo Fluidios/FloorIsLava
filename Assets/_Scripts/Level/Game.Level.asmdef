@@ -1,0 +1,17 @@
+{
+    "name": "Game.Level",
+    "rootNamespace": "Game.Level",
+    "references": [
+        "GUID:263c8c43b92ce4948aae953d9bf6bfe4",
+        "GUID:73d4e1f1df46438489b2b6bbb6901fee"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

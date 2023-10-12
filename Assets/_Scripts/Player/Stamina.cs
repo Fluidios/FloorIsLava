@@ -38,14 +38,16 @@ namespace Game.Player
             }
             return false;
         }
-        public bool TryHit()
+        public bool EnoughToHit()
+        {
+            return CurrentStamina >= _hitStaminaPrice;
+        }
+        public void SpendOnHit()
         {
             if (CurrentStamina >= _hitStaminaPrice)
             {
                 CurrentStamina -= _hitStaminaPrice;
-                return true;
             }
-            return false;
         }
     }
 }

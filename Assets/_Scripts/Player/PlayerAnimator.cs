@@ -9,6 +9,7 @@ namespace Game.Player
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private ParticleSystem _jumpParticles;
+        [SerializeField] private ParticleSystem _hitParticles;
         private Vector3 _velocity;
         private PlayerController _playerController;
         private bool _isFalling;
@@ -30,6 +31,7 @@ namespace Game.Player
         {
             _animator.SetTrigger("fall");
             float fallLength = _animator.GetCurrentAnimatorStateInfo(0).length;
+            StartCoroutine(ShowParticlesOnSurfaceCollision());
             StartCoroutine(DoWithDelay(fallLength, onEndFall));
             return fallLength;
         }
@@ -49,6 +51,19 @@ namespace Game.Player
         {
             yield return new WaitForSeconds(delay);
             action();
+        }
+        IEnumerator ShowParticlesOnSurfaceCollision()
+        {
+            while (!_playerController.IsGrounded)
+            {
+                yield return null;
+            }
+            _jumpParticles.Play();
+        }
+
+        internal void OnHitSomething()
+        {
+            _hitParticles.Play();
         }
     }
 }
