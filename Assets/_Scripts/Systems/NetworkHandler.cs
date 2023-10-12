@@ -60,7 +60,7 @@ namespace Game.Systems
                 connected?.Invoke(_runner);
             }
             else
-            {
+            { 
                 Debug.LogError("Failed to join lobby. Error: " + joinLobbyOperation.Result.ErrorMessage);
             }
         }
