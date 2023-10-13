@@ -10,6 +10,7 @@ namespace Game.Player
         [SerializeField] private Animator _animator;
         [SerializeField] private ParticleSystem _jumpParticles;
         [SerializeField] private ParticleSystem _hitParticles;
+        [SerializeField] private GameObject _model;
         private Vector3 _velocity;
         private PlayerController _playerController;
         private bool _isFalling;
@@ -64,6 +65,12 @@ namespace Game.Player
         internal void OnHitSomething()
         {
             _hitParticles.Play();
+        }
+
+        internal void HandleDeath()
+        {
+            _jumpParticles.Play();
+            _model.SetActive(false);
         }
     }
 }

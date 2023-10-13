@@ -5808,6 +5808,7 @@ GameObject:
   - component: {fileID: -2668702902326807483}
   - component: {fileID: 5181853734477015736}
   - component: {fileID: 4409842930590042701}
+  - component: {fileID: 3157532155481973545}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -5897,6 +5898,7 @@ MonoBehaviour:
   _animator: {fileID: 3580046118599246728}
   _jumpParticles: {fileID: 6734597184297394785}
   _hitParticles: {fileID: 4190405688627858802}
+  _model: {fileID: 7708788208678915921}
 --- !u!114 &1845958513617349430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5926,6 +5928,7 @@ MonoBehaviour:
   - {fileID: -2668702902326807483}
   - {fileID: 5181853734477015736}
   - {fileID: 4409842930590042701}
+  - {fileID: 3157532155481973545}
   SimulationBehaviours: []
 --- !u!114 &-5292610967942018083
 MonoBehaviour:
@@ -5993,6 +5996,7 @@ MonoBehaviour:
   _pusher: {fileID: 8511570622298309241}
   _dynamicBody: {fileID: -2668702902326807483}
   _stamina: {fileID: 4409842930590042701}
+  _hitbox: {fileID: 2216973305834368585}
   _Velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &8511570622298309241
 MonoBehaviour:
@@ -6007,6 +6011,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  _continuousPushing: 0
   _playerCenterPoint: {fileID: 60482612361708788}
   _pushRayLength: 0.2
   _regularPushLayerMask:
@@ -6044,7 +6049,7 @@ MonoBehaviour:
   Config: -1
   BroadRadius: 1.489847
   Offset: {x: 0, y: 0, z: 0}
-  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.11372549}
   Hitboxes:
   - {fileID: 0}
 --- !u!114 &4409842930590042701
@@ -6061,6 +6066,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _CurrentStamina: 0
+--- !u!114 &3157532155481973545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5767941750691822340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd23dcee340562c42b8baa3c017e129c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _collideableZone: {x: 0.4, y: 1.2, z: 0.4}
+  _interactableLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &5984261126660522158
 GameObject:
   m_ObjectHideFlags: 0

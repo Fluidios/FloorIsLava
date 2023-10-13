@@ -27,12 +27,12 @@ namespace Game.Level
         {
             playerController.Controller.maxSpeed *= _boostPower;
 
-            var boost = new AttachedBoost(StartCoroutine(RemoveBoostEffectFromPlayer(playerController)), Instantiate(_boostFx, playerController.transform));
+            var boost = new AttachedBoost(playerController.StartCoroutine(RemoveBoostEffectFromPlayer(playerController)), Instantiate(_boostFx, playerController.transform));
             _boostedPlayers.Add(playerController, boost);
         }
         private void RemoveBoost(PlayerController playerController)
         {
-            StopCoroutine(_boostedPlayers[playerController].Coroutine);
+            playerController.StopCoroutine(_boostedPlayers[playerController].Coroutine);
             Destroy(_boostedPlayers[playerController].FX);
             _boostedPlayers.Remove(playerController);
             playerController.Controller.maxSpeed /= _boostPower;

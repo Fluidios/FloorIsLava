@@ -158,7 +158,8 @@
         "Assembly-CSharp-firstpass",
         "Fusion.Prototyping",
         "Game.Player",
-        "Game.Systems"
+        "Game.Systems",
+        "Game.Level"
     ],
     "UseSerializableDictionary": true,
     "NullChecksForNetworkedProperties": true,

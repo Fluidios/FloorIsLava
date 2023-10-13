@@ -15,12 +15,17 @@ namespace Game.Player
         [SerializeField] private Pusher _pusher;
         [SerializeField] private DynamicBody _dynamicBody;
         [SerializeField] private Stamina _stamina;
+        [SerializeField] private Hitbox _hitbox;
         private NetworkCharacterControllerPrototype _networkCharacterController;
+        private bool _isDead;
 
         [Networked]
         public Vector3 Velocity { get; set; }
         public bool IsGrounded => _networkCharacterController.IsGrounded;
         public NetworkCharacterControllerPrototype Controller => _networkCharacterController;
+
+        public bool IsDead { get => _isDead;}
+
         private bool _isPushedAndFalling;
         private Vector3 _currentPushVelocity;
 
@@ -33,6 +38,7 @@ namespace Game.Player
         }
         public override void FixedUpdateNetwork()
         {
+            if(_isDead) return;
             if (_isPushedAndFalling)
             {
                 _networkCharacterController.Velocity = _currentPushVelocity + Physics.gravity;
@@ -86,9 +92,11 @@ namespace Game.Player
             _playerAnimator.TryJump();
         }
         internal float HandleFall()
-        { 
+        {
+            _hitbox.enabled = false;
             return _playerAnimator.TryFall(()=>
             {
+                _hitbox.enabled = true;
                 _isPushedAndFalling = false;
             });
         }
@@ -96,6 +104,14 @@ namespace Game.Player
         internal void RPC_OnHitSomething()
         {
             _playerAnimator.OnHitSomething();
+        }
+        [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
+        public void RPC_HandleDeath()
+        {
+            _isDead = true;
+            _playerAnimator.HandleDeath();
+            _hitbox.enabled = false;
+            Debug.Log("Dead");
         }
         [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
         internal void RPC_OnBeingPushed(Vector3 pushPower)

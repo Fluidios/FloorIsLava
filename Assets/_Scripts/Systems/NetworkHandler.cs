@@ -80,7 +80,7 @@ namespace Game.Systems
                 }
             }
 
-            Task joinSessionOperation;
+            Task<StartGameResult> joinSessionOperation;
             if (sessionToJoin.Length > 0)
             {
                 Debug.Log("Joining existing session...");
@@ -91,15 +91,14 @@ namespace Game.Systems
                 Debug.Log("Creating new session...");
                 joinSessionOperation = JoinSession(runner, GameMode.Host, sessionToJoin, _sceneManager, (runner) => OnConnectedToSession.Invoke(runner));
             }
-            if (!joinSessionOperation.IsCompleted)
+            await joinSessionOperation;
+            if (!joinSessionOperation.Result.Ok)
             {
-                if (joinSessionOperation.IsCanceled)
-                    Debug.LogError("Operation canceled.");
-                else if(joinSessionOperation.IsFaulted)
-                    Debug.LogError("Failed to join session. Error: " + joinSessionOperation.Exception.Message);
+
+                Debug.LogError(string.Format("Failed to join session. Reason: {0}; Error: {1};", joinSessionOperation.Result.ShutdownReason, joinSessionOperation.Result.ErrorMessage));
             }
         }
-        protected virtual Task JoinSession(
+        protected virtual Task<StartGameResult> JoinSession(
             NetworkRunner runner,
             GameMode gameMode,
             string sessionName,
@@ -114,11 +113,9 @@ namespace Game.Systems
                 SessionName = sessionName,
                 Initialized = initialized,
                 SceneManager = sceneManager,
-                PlayerCount = _sessionsSize
+                PlayerCount = _sessionsSize 
             };
-
             var startGameResult = runner.StartGame(startGameArgs);
-
             return startGameResult;
         }
 

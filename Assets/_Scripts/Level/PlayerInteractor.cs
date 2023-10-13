@@ -14,14 +14,17 @@ namespace Game.Level
         List<LagCompensatedHit> _hits = new List<LagCompensatedHit>();
         private InteractableObject _interactableObject;
         private PlayerController _playerController;
-
+        private Vector3 _possitionOffset;
         public override void Spawned()
         {
             base.Spawned();
+            _possitionOffset = Vector3.up * _collideableZone.y / 2;
             _playerController = GetComponent<PlayerController>();
+
         }
         public override void FixedUpdateNetwork()
         {
+            if(_playerController.IsDead) return;
             if (Runner.IsServer)
             {
                 DetectCollisions();
@@ -30,16 +33,21 @@ namespace Game.Level
         private void DetectCollisions()
         {
             //_hitCollider = Runner.GetPhysicsScene2D().OverlapBox(transform.position, _collider.bounds.size * .9f, 0, LayerMask.GetMask("Interact"));
-            if (Runner.LagCompensation.OverlapBox(transform.position, _collideableZone, transform.rotation, Object.InputAuthority, _hits, _interactableLayerMask) > 0)
+            if (Runner.LagCompensation.OverlapBox(transform.position + _possitionOffset, _collideableZone, transform.rotation, Object.InputAuthority, _hits, _interactableLayerMask) > 0)
             {
                 foreach (var hit in _hits)
                 {
-                    if (hit.GameObject.TryGetComponent<InteractableObject>(out _interactableObject))
+                    if (hit.GameObject.transform.root.TryGetComponent<InteractableObject>(out _interactableObject))
                     {
                         _interactableObject.RPC_Interact(_playerController);
                     }
                 }
             }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.DrawWireCube(transform.position + Vector3.up * _collideableZone.y / 2, _collideableZone);
         }
     }
 }
