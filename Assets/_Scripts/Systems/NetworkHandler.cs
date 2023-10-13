@@ -26,6 +26,7 @@ namespace Game.Systems
         private void Start()
         {
             InitializeRunner();
+            OnConnectedToSession.AddListener((r) => Debug.Log("Connected to session " + r.SessionInfo.Name));
         }
         public void TryConnect()
         {
@@ -38,6 +39,7 @@ namespace Game.Systems
         }
         private void InitializeRunner()
         {
+            Debug.Log("Init runner");
             _runner = gameObject.AddComponent<NetworkRunner>();
             _sceneManager = _runner.GetComponents<INetworkSceneManager>().FirstOrDefault();
             if (_sceneManager == null)
@@ -53,10 +55,12 @@ namespace Game.Systems
             Action<NetworkRunner> connected
         )
         {
+            Debug.Log("Start lobby connection...");
             var joinLobbyOperation = runner.JoinSessionLobby(SessionLobby.Custom, lobbyID: lobbyID/*, authentication: authentication*/);
             await joinLobbyOperation;
             if (joinLobbyOperation.Result.Ok)
             {
+                Debug.Log("Connected to lobby "+ runner.LobbyInfo.Name);
                 connected?.Invoke(_runner);
             }
             else
@@ -64,7 +68,7 @@ namespace Game.Systems
                 Debug.LogError("Failed to join lobby. Error: " + joinLobbyOperation.Result.ErrorMessage);
             }
         }
-        private void FindSessionToJoinOrCreateNew(NetworkRunner runner, List<SessionInfo> sessionList)
+        private async void FindSessionToJoinOrCreateNew(NetworkRunner runner, List<SessionInfo> sessionList)
         {
             string sessionToJoin = string.Empty;
             foreach (SessionInfo sessionInfo in sessionList)
@@ -79,15 +83,20 @@ namespace Game.Systems
             Task joinSessionOperation;
             if (sessionToJoin.Length > 0)
             {
+                Debug.Log("Joining existing session...");
                 joinSessionOperation = JoinSession(runner, GameMode.Client, sessionToJoin, _sceneManager, (runner) => OnConnectedToSession.Invoke(runner));
             }
             else
             {
+                Debug.Log("Creating new session...");
                 joinSessionOperation = JoinSession(runner, GameMode.Host, sessionToJoin, _sceneManager, (runner) => OnConnectedToSession.Invoke(runner));
             }
-            if (joinSessionOperation.IsFaulted)
+            if (!joinSessionOperation.IsCompleted)
             {
-                Debug.LogError("Failed to join session. Error: " + joinSessionOperation.Exception.Message);
+                if (joinSessionOperation.IsCanceled)
+                    Debug.LogError("Operation canceled.");
+                else if(joinSessionOperation.IsFaulted)
+                    Debug.LogError("Failed to join session. Error: " + joinSessionOperation.Exception.Message);
             }
         }
         protected virtual Task JoinSession(
