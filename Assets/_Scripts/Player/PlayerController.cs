@@ -25,6 +25,7 @@ namespace Game.Player
         public NetworkCharacterControllerPrototype Controller => _networkCharacterController;
 
         public bool IsDead { get => _isDead;}
+        public Stamina Stamina => _stamina;
 
         private bool _isPushedAndFalling;
         private Vector3 _currentPushVelocity;
@@ -35,6 +36,10 @@ namespace Game.Player
             _playerAnimator.Setup(this);
             _pusher.Setup(this);
             _dynamicBody.Setup(this);
+        }
+        public override void Spawned()
+        {
+            gameObject.name = Object.InputAuthority.ToString();
         }
         public override void FixedUpdateNetwork()
         {
@@ -93,10 +98,10 @@ namespace Game.Player
         }
         internal float HandleFall()
         {
-            _hitbox.enabled = false;
+            _hitbox.HitboxActive = false;
             return _playerAnimator.TryFall(()=>
             {
-                _hitbox.enabled = true;
+                _hitbox.HitboxActive = true;
                 _isPushedAndFalling = false;
             });
         }
@@ -110,7 +115,7 @@ namespace Game.Player
         {
             _isDead = true;
             _playerAnimator.HandleDeath();
-            _hitbox.enabled = false;
+            _hitbox.HitboxActive = false;
             Debug.Log("Dead");
         }
         [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]

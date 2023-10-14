@@ -50,7 +50,7 @@ namespace Game.Player
                     if (hit.Hitbox != null)
                     {
                         if (hit.Hitbox.transform.root == transform) continue;
-                        hit.Hitbox.transform.root.GetComponent<DynamicBody>().Push(Vector3.up * 10 + (hit.Point - _playerCenterPoint.position).normalized * _pushPower, true);
+                        hit.Hitbox.transform.root.GetComponent<DynamicBody>().Push(Vector3.up * 10 + _playerCenterPoint.forward * _pushPower, true);
                         _playerController.RPC_OnHitSomething();
                     }
                     else if (hit.Collider != null) 

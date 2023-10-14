@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 4349902347007693610}
   - component: {fileID: 4313253930937290900}
   - component: {fileID: 6026422488254727214}
-  - component: {fileID: 7422719414420359755}
+  - component: {fileID: 7798532799228323829}
+  - component: {fileID: 4739467998717394865}
   m_Layer: 6
-  m_Name: Boost
+  m_Name: JumpBoost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 105528079085512194}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16.815948, y: 2.63, z: 21.939587}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -73,13 +74,14 @@ MonoBehaviour:
   AoiPositionSource: {fileID: 0}
   Flags: 2305
   NetworkGuid:
-    RawGuidValue: 3d43b377501e87847bb728451b7d0d7c
+    RawGuidValue: 564990b1ae7bc6443864eb142956a5e2
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4313253930937290900}
-  - {fileID: 7422719414420359755}
+  - {fileID: 7798532799228323829}
+  - {fileID: 4739467998717394865}
   SimulationBehaviours: []
---- !u!114 &7422719414420359755
+--- !u!114 &7798532799228323829
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -88,15 +90,44 @@ MonoBehaviour:
   m_GameObject: {fileID: 105528079085512194}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae79e9984b6f1a743975aa1a20ebded1, type: 3}
+  m_Script: {fileID: 11500000, guid: 5991b7ace299d914eb2b7e54295508ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _respawnTime: 10
   _visualWithHitbox: {fileID: 2789726634600017776}
+  _hideAfterInteraction: 1
   _boostPower: 2
   _boostLength: 10
-  _boostFx: {fileID: 6261629833486958089, guid: 3311ad994351bdb4a992a040b05156f3, type: 3}
+  _boostFx: {fileID: 6261629833486958089, guid: ec071fca8ae900a438e479d8d0912b57, type: 3}
+--- !u!114 &4739467998717394865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105528079085512194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 3
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 0
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
 --- !u!1 &8339435785683548763
 GameObject:
   m_ObjectHideFlags: 0
@@ -209,6 +240,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 33118119716790622, guid: 7bc251a7285632341a306c70a8f1cfbe, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: ae61531319e382f428df074eeb4f6f52, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -52,7 +52,7 @@ MonoBehaviour:
   _respawnTime: 0
   _visualWithHitbox: {fileID: 8931061566513470547}
   _hideAfterInteraction: 0
-  _flow_speed: 0.01
+  _flow_speed: 0.02
 --- !u!114 &5173986195423210689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,6 +225,6 @@ MonoBehaviour:
   Type: 1
   SphereRadius: 0
   BoxExtents: {x: 30, y: 0.1, z: 30}
-  Offset: {x: 0, y: -0.2, z: 0}
+  Offset: {x: 0, y: -0.4, z: 0}
   Root: {fileID: 1271521667240396461}
   GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

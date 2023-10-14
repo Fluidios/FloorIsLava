@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4672985618816203992}
   - component: {fileID: 2252870763793246953}
   m_Layer: 0
-  m_Name: BostSpawner
+  m_Name: JumpBostSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,5 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _objectsToPopulate: 1
   _prefab:
-    RawGuidValue: 3d43b377501e87847bb728451b7d0d7c
+    RawGuidValue: 564990b1ae7bc6443864eb142956a5e2
   _spawnVolume: {x: 0.01, y: 0, z: 0.01}
+  _randomizeYRotation: 0

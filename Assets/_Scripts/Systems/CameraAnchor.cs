@@ -58,6 +58,7 @@ namespace Game.Systems
             {
                 if (_myPlayerController.IsDead)
                 {
+                    _active = false;
                     TryRetarget();
                     _controls.Default.Previous.performed += TryRetargetToPreviousAlivePlayer;
                     _controls.Default.Next.performed += TryRetargetToNextAlivePlayer;
@@ -74,7 +75,10 @@ namespace Game.Systems
             _observedPlayerController = FindRandomAlivePlayer();
             _observerMode = _observedPlayerController != null;
             if (_observerMode)
+            {
+                Debug.Log("Set target to " + _observedPlayerController.name);
                 _cameraSystem.SetTarget(_observedPlayerController.transform);
+            }
         }
         private List<PlayerController> GetAlivePlayers()
         {
@@ -96,8 +100,7 @@ namespace Game.Systems
             {
                 int currentlyObservedPlayerIndex = alive.IndexOf(_observedPlayerController);
                 int targetIndex = currentlyObservedPlayerIndex - 1;
-                          RetargetByIndex(targetIndex, alive);
-                return;
+                RetargetByIndex(targetIndex, alive);
             }
         }
         private void TryRetargetToNextAlivePlayer(InputAction.CallbackContext context)
@@ -120,7 +123,9 @@ namespace Game.Systems
             {
                 index = 0;
             }
+            Debug.Log("Set target to " + _observedPlayerController.name);
             _observedPlayerController = list[index];
+            _cameraSystem.SetTarget(_observedPlayerController.transform);
         }
 
         IEnumerator WaitForSelfNetworkObjectInitialization(Action actionAfterInitialization)

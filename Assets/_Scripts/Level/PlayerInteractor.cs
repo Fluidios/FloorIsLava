@@ -47,7 +47,7 @@ namespace Game.Level
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.DrawWireCube(transform.position + Vector3.up * _collideableZone.y / 2, _collideableZone);
+            Gizmos.DrawWireCube(transform.position + Vector3.up * _collideableZone.y, _collideableZone*2);
         }
     }
 }
