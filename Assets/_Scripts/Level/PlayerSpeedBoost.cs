@@ -13,10 +13,8 @@ namespace Game.Level
 
         static Dictionary<PlayerController, AttachedBoost> _boostedPlayers = new Dictionary<PlayerController, AttachedBoost>();
 
-        internal override void RPC_Interact(PlayerController playerController)
+        protected override void HandleInteraction(PlayerController playerController)
         {
-            base.RPC_Interact(playerController);
-
             if (_boostedPlayers.ContainsKey(playerController))
             {
                 RemoveBoost(playerController);
@@ -26,7 +24,6 @@ namespace Game.Level
         private void AddBoost(PlayerController playerController)
         {
             playerController.Controller.maxSpeed *= _boostPower;
-
             var boost = new AttachedBoost(playerController.StartCoroutine(RemoveBoostEffectFromPlayer(playerController)), Instantiate(_boostFx, playerController.transform));
             _boostedPlayers.Add(playerController, boost);
         }

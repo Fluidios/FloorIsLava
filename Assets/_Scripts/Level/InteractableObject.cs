@@ -1,7 +1,5 @@
 using Fusion;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.Level
@@ -9,25 +7,31 @@ namespace Game.Level
     public abstract class InteractableObject : NetworkBehaviour
     {
         [SerializeField, Tooltip("0 mean no respawning behaviour")] private float _respawnTime;
-        [SerializeField] private Hitbox _hitbox;
-        [SerializeField] private GameObject _visual;
+        [SerializeField] private Hitbox _visualWithHitbox;
+        [SerializeField] private bool _hideAfterInteraction = true;
+        public bool Disabled { get; set; }
 
         [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
-        internal virtual void RPC_Interact(Player.PlayerController _playerController)
+        internal void RPC_Interact(Player.PlayerController _playerController)
         {
-            AfterInteraction();
+            if (Disabled) return;
+            HandleInteraction(_playerController);
+            if(_hideAfterInteraction) HideAfterInteraction();
         }
-        private void AfterInteraction()
+        protected virtual void HandleInteraction(Player.PlayerController _playerController) { }
+        private void HideAfterInteraction()
         {
-            _hitbox.enabled = false;
-            _visual.SetActive(false);
+            Disabled = true;
+            _visualWithHitbox.gameObject.SetActive(false);
+            _visualWithHitbox.HitboxActive = false;
             if (_respawnTime > 0)
                 StartCoroutine(RespawnR());
         }
         private void Respawn()
         {
-            _hitbox.enabled = true;
-            _visual.SetActive(true);
+            Disabled = false;
+            _visualWithHitbox.gameObject.SetActive(true);
+            _visualWithHitbox.HitboxActive = true;
         }
 
         IEnumerator RespawnR()

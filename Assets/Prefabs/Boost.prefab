@@ -93,8 +93,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _respawnTime: 10
-  _hitbox: {fileID: 2789726634600017776}
-  _visual: {fileID: 8339435785683548763}
+  _visualWithHitbox: {fileID: 2789726634600017776}
   _boostPower: 2
   _boostLength: 10
   _boostFx: {fileID: 6261629833486958089, guid: 3311ad994351bdb4a992a040b05156f3, type: 3}

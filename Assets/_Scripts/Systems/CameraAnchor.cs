@@ -1,4 +1,5 @@
 using Fusion;
+using Game.Input;
 using Game.Player;
 using Game.SystemsManagement;
 using System;
@@ -6,6 +7,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 namespace Game.Systems
 {
@@ -17,10 +20,28 @@ namespace Game.Systems
         private PlayerController _observedPlayerController;
         private bool _observerMode;
         private List<PlayerController> _players;
+        private Controls _controls;
+        private List<PlayerController> AllPlayers
+        {
+            get
+            {
+                if (_players == null)
+                {
+                    _players = new List<PlayerController>();
+                    foreach (var player in Runner.ActivePlayers)
+                    {
+                        _players.Add(Runner.GetPlayerObject(player).GetComponent<PlayerController>());
+                    }
+                }
+                return _players;
+            }
+        }
+
         private void Awake()
         {
             _cameraSystem = SystemsManager.GetSystemOfType<CameraSystem>();
             StartCoroutine(WaitForSelfNetworkObjectInitialization(TryAttachCameraToMe));
+            _controls = Controls.Instance;
         }
         private void TryAttachCameraToMe()
         {
@@ -38,11 +59,12 @@ namespace Game.Systems
                 if (_myPlayerController.IsDead)
                 {
                     TryRetarget();
+                    _controls.Default.Previous.performed += TryRetargetToPreviousAlivePlayer;
+                    _controls.Default.Next.performed += TryRetargetToNextAlivePlayer;
                 }
             }
             else if(_observerMode)
             {
-                //switching between alive players
                 if (_observedPlayerController.IsDead)
                     TryRetarget();
             }
@@ -54,18 +76,51 @@ namespace Game.Systems
             if (_observerMode)
                 _cameraSystem.SetTarget(_observedPlayerController.transform);
         }
+        private List<PlayerController> GetAlivePlayers()
+        {
+            List<PlayerController> _alive = new List<PlayerController>();
+            foreach (PlayerController player in AllPlayers) { if (player.IsDead) continue; _alive.Add(player); }
+            return _alive;
+        }
         private PlayerController FindRandomAlivePlayer()
         {
-            if(_players == null)
-            {
-                _players = new List<PlayerController>();
-                _players.AddRange(GameObject.FindObjectsOfType<PlayerController>());
-            }
-            List<PlayerController> _alive = new List<PlayerController>();
-            foreach (PlayerController player in _players) { if(player.IsDead) continue; _alive.Add(player); }
-            if(_alive.Count > 0)
-                return _alive[UnityEngine.Random.Range(0, _alive.Count)];
+            var alive = GetAlivePlayers();
+            if(alive.Count > 0)
+                return alive[UnityEngine.Random.Range(0, alive.Count)];
             else return null;
+        }
+        private void TryRetargetToPreviousAlivePlayer(InputAction.CallbackContext context)
+        {
+            var alive = GetAlivePlayers();
+            if (alive.Count > 1)
+            {
+                int currentlyObservedPlayerIndex = alive.IndexOf(_observedPlayerController);
+                int targetIndex = currentlyObservedPlayerIndex - 1;
+                          RetargetByIndex(targetIndex, alive);
+                return;
+            }
+        }
+        private void TryRetargetToNextAlivePlayer(InputAction.CallbackContext context)
+        {
+            var alive = GetAlivePlayers();
+            if (alive.Count > 1)
+            {
+                int currentlyObservedPlayerIndex = alive.IndexOf(_observedPlayerController);
+                int targetIndex = currentlyObservedPlayerIndex + 1;
+                RetargetByIndex(targetIndex, alive);
+            }
+        }
+        private void RetargetByIndex(int index, List<PlayerController> list)
+        {
+            if (index < 0)
+            {
+                index = list.Count - 1;
+            }
+            else if (index >= list.Count)
+            {
+                index = 0;
+            }
+            _observedPlayerController = list[index];
         }
 
         IEnumerator WaitForSelfNetworkObjectInitialization(Action actionAfterInitialization)
