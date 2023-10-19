@@ -1,0 +1,16 @@
+{
+    "name": "Game.FirebaseHandler",
+    "rootNamespace": "Game.FirebaseHandler",
+    "references": [
+        "GUID:c69431f594ce7bd41862b3caaa58ce6d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

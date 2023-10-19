@@ -1,5 +1,6 @@
 using Fusion;
 using Fusion.Sockets;
+using Game.FirebaseHandler;
 using Game.Player;
 using System;
 using System.Collections;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 namespace Game.Systems
@@ -14,11 +16,7 @@ namespace Game.Systems
     public class Lobby : MonoBehaviour
     {
         public const int PlayersPerMatch = 2;
-        [Header("Authentification"), SerializeField] private GameObject _authentificationForm;
-        [SerializeField] TMP_InputField _emailInput;
-        [SerializeField] TMP_InputField _nicknameInput;
-        [SerializeField] GameObject _profileCreationConfirmationForm;
-        [SerializeField] Button _createNewProfile;
+        [Header("Authentification"), SerializeField] private LobbyAuthUI _authentification;
         [Header("Waiting room"), SerializeField] private GameObject _waitingForPlayersForm;
         [SerializeField] private TextMeshProUGUI _roomStatusText;
         [SerializeField] private Button _playerReadyButton;
@@ -33,55 +31,10 @@ namespace Game.Systems
         NetworkRunner _networkRunner;
 
         private bool _iAmReadyToPlay;
-        private string EMail
-        {
-            get { return PlayerPrefs.GetString("Email"); }
-            set { PlayerPrefs.SetString("Email", value); }
-        }
-        internal string Nickname
-        {
-            get { return PlayerPrefs.GetString("Nick"); }
-            set { PlayerPrefs.SetString("Nick", value); }
-        }
         private void Awake()
         {
-            Authentification();
+            _authentification.Authentificate();
         }
-        #region Authentification
-        private void Authentification()
-        {
-            if (EMail.Length <= 0)
-            {
-                _authentificationForm.SetActive(true);
-                _emailInput.onEndEdit.AddListener(ValidateAuthentificationInfo);
-                _nicknameInput.onEndEdit.AddListener(ValidateAuthentificationInfo);
-                _createNewProfile.onClick.AddListener(CreateNewProfileWithCurrentData);
-            }
-            else
-            {
-                Debug.Log(string.Format("Signed in as {0} ({1})", Nickname, EMail));
-            }
-        }
-        private void ValidateAuthentificationInfo(string str)
-        {
-            if (_emailInput.text.Length > 0 && _nicknameInput.text.Length > 0)
-            {
-                _profileCreationConfirmationForm.SetActive(true);
-            }
-            else
-            {
-                _profileCreationConfirmationForm.SetActive(false);
-            }
-        }
-        private void CreateNewProfileWithCurrentData()
-        {
-            EMail = _emailInput.text;
-            Nickname = _nicknameInput.text;
-            _profileCreationConfirmationForm.SetActive(false);
-            _authentificationForm.SetActive(false);
-            Debug.Log(string.Format("Registered as {0} ({1})", Nickname, EMail));
-        }
-        #endregion
         public void TryToConnectToSession()
         {
             _loadingScreen.gameObject.SetActive(true);

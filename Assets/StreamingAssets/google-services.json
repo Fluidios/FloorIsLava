@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "130242295325",
+    "project_id": "floorislava-9a101",
+    "storage_bucket": "floorislava-9a101.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:130242295325:android:4f6562977e38bcef1878f4",
+        "android_client_info": {
+          "package_name": "poisoned.coffee.games.floorislava"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1TKUDKIuLVmuXrMri2yQE77gkjcZLfrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

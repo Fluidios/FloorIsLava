@@ -10,6 +10,7 @@ using UnityEngine.Events;
 using Fusion.Photon.Realtime;
 using Game.Player;
 using UnityEngine.UIElements;
+using Game.FirebaseHandler;
 
 namespace Game.Systems
 {
@@ -33,7 +34,7 @@ namespace Game.Systems
             ConnectToLobby(
                 _runner,
                 "MainLobby",
-                new AuthenticationValues(_lobby.Nickname),
+                new AuthenticationValues(UserAuth.UserNickName),
                 null
             );
         }
