@@ -270,7 +270,7 @@ GameObject:
   - component: {fileID: 91516651}
   - component: {fileID: 91516650}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: ErrorDescription
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -904,10 +904,10 @@ RectTransform:
   m_Father: {fileID: 1071211845}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.8723, y: 9.5314}
-  m_SizeDelta: {x: 421.2352, y: 382.4226}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 2.8723145, y: -2.435089}
+  m_SizeDelta: {x: -170.7648, y: -181.64441}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &574666412
 MonoBehaviour:
@@ -6012,6 +6012,7 @@ MonoBehaviour:
   _signInButton: {fileID: 520966059}
   _escapeButton: {fileID: 1557124330}
   _errorForm: {fileID: 574666410}
+  _errorText: {fileID: 91516650}
 --- !u!222 &5165790282404861871
 CanvasRenderer:
   m_ObjectHideFlags: 0

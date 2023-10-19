@@ -21,6 +21,7 @@ namespace Game.Systems
         [SerializeField] Button _signInButton;
         [SerializeField] Button _escapeButton;
         [SerializeField] GameObject _errorForm;
+        [SerializeField] TextMeshProUGUI _errorText;
 
         private void Awake()
         {
@@ -127,9 +128,9 @@ namespace Game.Systems
         {
             var signInTask = UserAuth.TrySignIn(UserAuth.LocalEmail, UserAuth.LocalPassword);
             await signInTask;
-            if (signInTask.Result)
+            if (signInTask.Result == Firebase.Auth.AuthError.None)
             {
-                Debug.Log("Signed in.");
+                Debug.Log("Signed in with local requisites.");
             }
             else
             {
@@ -141,7 +142,7 @@ namespace Game.Systems
             _signInButton.interactable = false;
             var signInTask = UserAuth.TrySignIn(_emailInput.text, _passwordInput.text);
             await signInTask;
-            if (signInTask.Result)
+            if (signInTask.Result == Firebase.Auth.AuthError.None)
             {
                 HideForm();
                 _signInButton.interactable = true;
@@ -149,6 +150,7 @@ namespace Game.Systems
             else
             {
                 _signInButton.interactable = true;
+                _errorText.text = signInTask.Result.ToString();
                 _errorForm.SetActive(true);
             }
         }
@@ -157,7 +159,7 @@ namespace Game.Systems
             _signUpButton.interactable = false;
             var signUpTask = UserAuth.CreateUser(_emailInput.text, _passwordInput.text, _nicknameInput.text);
             await signUpTask;
-            if (signUpTask.Result)
+            if (signUpTask.Result == Firebase.Auth.AuthError.None)
             {
                 HideForm();
                 _signInButton.interactable = true;
@@ -165,6 +167,7 @@ namespace Game.Systems
             else
             {
                 _signInButton.interactable = true;
+                _errorText.text = signUpTask.Result.ToString();
                 _errorForm.SetActive(true);
             }
         }

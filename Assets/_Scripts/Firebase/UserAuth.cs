@@ -1,4 +1,7 @@
+using Firebase;
+using Firebase.Auth;
 using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -30,45 +33,68 @@ namespace Game.FirebaseHandler
                 return "UNKNOWN";
             }
         }
-        public static async Task<bool> CreateUser(string email, string password, string nickname)
+        public static async Task<AuthError> CreateUser(string email, string password, string nickname)
         {
             var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
             var authTask = auth.CreateUserWithEmailAndPasswordAsync(email, password);
-            await authTask;
+            AuthError error = AuthError.Failure;
+            try
+            {
+                await authTask;
+            }
+            catch (Exception e)
+            {
+                if (authTask.Exception != null && authTask.Exception.InnerExceptions[0] != null)
+                {
+                    FirebaseException firebaseException = authTask.Exception.InnerExceptions[0] as FirebaseException;
+                    error = (AuthError)firebaseException.ErrorCode;
+                    Debug.LogWarning("Firebase error: " + error);
+                }
+                else
+                {
+                    Debug.LogWarning("Unknown error: " + e.Message);
+                    error = AuthError.Failure;
+                }
+            }
             if (authTask.IsCompleted)
             {
+                LocalEmail = authTask.Result.User.Email;
+                LocalPassword = password;
                 Debug.LogWarning("Update Nick!!!!");
-                return true;
+                return AuthError.None;
             }
-            else if (authTask.IsCanceled)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
-            }
-            else if(authTask.IsFaulted)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + authTask.Exception);
-            }
-            return false;
+            return error;
         }
-        public static async Task<bool> TrySignIn(string email, string password)
+        public static async Task<AuthError> TrySignIn(string email, string password)
         {
             var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
             var authTask = auth.SignInWithEmailAndPasswordAsync(email, password);
-            await authTask;
-            if (authTask.IsCompleted)
+            AuthError error = AuthError.Failure;
+            try
             {
-                Debug.Log("Signed In");
-                return true;
+                await authTask;
+                if (authTask.IsCompleted)
+                {
+                    Debug.Log("Signed In");
+                    error = AuthError.None;
+                    return error;
+                }
             }
-            else if (authTask.IsCanceled)
+            catch(Exception e)
             {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
+                if(authTask.Exception != null && authTask.Exception.InnerExceptions[0] != null)
+                {
+                    FirebaseException firebaseException = authTask.Exception.InnerExceptions[0] as FirebaseException;
+                    error = (AuthError)firebaseException.ErrorCode;
+                    Debug.LogWarning("Firebase error: " + error);
+                }
+                else
+                {
+                    error = AuthError.Failure;
+                    Debug.LogWarning("Unknown error: " + e.Message);
+                }
             }
-            else if (authTask.IsFaulted)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + authTask.Exception);
-            }
-            return false;
+            return error;
         }
     }
 }
