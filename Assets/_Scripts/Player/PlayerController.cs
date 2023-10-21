@@ -37,10 +37,6 @@ namespace Game.Player
             _pusher.Setup(this);
             _dynamicBody.Setup(this);
         }
-        public override void Spawned()
-        {
-            gameObject.name = Object.InputAuthority.ToString();
-        }
         public override void FixedUpdateNetwork()
         {
             if(_isDead) return;
