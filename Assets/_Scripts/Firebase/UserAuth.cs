@@ -60,7 +60,7 @@ namespace Game.FirebaseHandler
             {
                 LocalEmail = authTask.Result.User.Email;
                 LocalPassword = password;
-                Debug.LogWarning("Update Nick!!!!");
+                await UpdateNickname(nickname);
                 return AuthError.None;
             }
             return error;
@@ -76,6 +76,8 @@ namespace Game.FirebaseHandler
                 if (authTask.IsCompleted)
                 {
                     Debug.Log("Signed In");
+                    LocalEmail = authTask.Result.User.Email;
+                    LocalPassword = password;
                     error = AuthError.None;
                     return error;
                 }
@@ -95,6 +97,33 @@ namespace Game.FirebaseHandler
                 }
             }
             return error;
+        }
+
+        public static async Task<bool> UpdateNickname(string nickname)
+        {
+            Firebase.Auth.FirebaseUser user = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser;
+            if (user != null)
+            {
+                Firebase.Auth.UserProfile profile = new Firebase.Auth.UserProfile
+                {
+                    DisplayName = nickname,
+                };
+                var updateTask = user.UpdateUserProfileAsync(profile);
+                await updateTask;
+                if (updateTask.IsCanceled)
+                {
+                    Debug.LogError("UpdateUserProfileAsync was canceled.");
+                    return false;
+                }
+                if (updateTask.IsFaulted)
+                {
+                    Debug.LogError("UpdateUserProfileAsync encountered an error: " + updateTask.Exception);
+                    return false;
+                }
+                Debug.Log("User profile updated successfully.");
+                return true;
+            }
+            return false;
         }
     }
 }

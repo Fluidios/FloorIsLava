@@ -22,10 +22,21 @@ namespace Game.Systems
         [SerializeField] Button _escapeButton;
         [SerializeField] GameObject _errorForm;
         [SerializeField] TextMeshProUGUI _errorText;
+        [SerializeField] private TMP_InputField _nicknameText;
+        public Action AuthPassed;
 
         private void Awake()
         {
             _escapeButton.onClick.AddListener(ShowForm);
+
+            _nicknameText.onEndEdit.AddListener(TryUpdateNickname);
+
+            _nicknameText.gameObject.SetActive(false);
+            AuthPassed += () =>
+            {
+                _nicknameText.SetTextWithoutNotify(UserAuth.UserNickName);
+                _nicknameText.gameObject.SetActive(true);
+            };
         }
 
         public void Authentificate()
@@ -130,6 +141,7 @@ namespace Game.Systems
             await signInTask;
             if (signInTask.Result == Firebase.Auth.AuthError.None)
             {
+                AuthPassed?.Invoke();
                 Debug.Log("Signed in with local requisites.");
             }
             else
@@ -146,6 +158,7 @@ namespace Game.Systems
             {
                 HideForm();
                 _signInButton.interactable = true;
+                AuthPassed?.Invoke();
             }
             else
             {
@@ -163,6 +176,7 @@ namespace Game.Systems
             {
                 HideForm();
                 _signInButton.interactable = true;
+                AuthPassed?.Invoke();
             }
             else
             {
@@ -173,13 +187,27 @@ namespace Game.Systems
         }
         private void ValidateSignInData(string str)
         {
-            bool validation = _emailInput.text.Length > 0 && _passwordInput.text.Length > 0;
+            bool validation = _emailInput.text.Length > 0 && _passwordInput.text.Length > 8;
             _signInButton.gameObject.SetActive(validation);
         }
         private void ValidateSignUpData(string str)
         {
-            bool validation = _emailInput.text.Length > 0 && _nicknameInput.text.Length > 0 && _passwordInput.text.Length > 0;
+            bool validation = _emailInput.text.Length > 0 && _nicknameInput.text.Length > 0 && _passwordInput.text.Length > 8;
             _signUpButton.gameObject.SetActive(validation);
+        }
+
+        private async void TryUpdateNickname(string newNickname)
+        {
+            var task = UserAuth.UpdateNickname(newNickname);
+            await task;
+            if(task.Result)
+            {
+                Debug.Log("Nickname updated!");
+            }
+            else
+            {
+                _nicknameText.SetTextWithoutNotify(UserAuth.UserNickName);
+            }
         }
     }
 }

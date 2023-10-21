@@ -31,7 +31,7 @@ namespace Game.Systems
         NetworkRunner _networkRunner;
 
         private bool _iAmReadyToPlay;
-        private void Awake()
+        private void Start()
         {
             _authentification.Authentificate();
         }

@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 4030020468005650192}
   - component: {fileID: 2572374968605806334}
   - component: {fileID: 8322509433896476796}
+  - component: {fileID: 8422796230080393413}
   - component: {fileID: 8931061566513470547}
   m_Layer: 6
   m_Name: Interpolated
@@ -188,7 +189,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d4bfbcf92e5c6b24e94cc479b668fe53, type: 2}
+  - {fileID: 2100000, guid: 6042eaad9823b6f488f160b2bce47ac7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -210,6 +211,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8422796230080393413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9051075842853659006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3d28cb150ad86f4a8100312a4aea7a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uvAnimationRate: {x: 0.002, y: 0.001}
+  textureName: _LavaTex
 --- !u!114 &8931061566513470547
 MonoBehaviour:
   m_ObjectHideFlags: 0

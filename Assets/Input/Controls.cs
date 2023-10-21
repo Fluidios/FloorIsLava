@@ -142,6 +142,17 @@ namespace Game.Input
                 },
                 {
                     ""name"": """",
+                    ""id"": ""c4a24b0f-67fe-498e-b753-5738f0cd2d27"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""e3834b61-31ea-4acc-a2ef-e521245fa9ea"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
