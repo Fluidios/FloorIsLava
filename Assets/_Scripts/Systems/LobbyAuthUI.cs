@@ -187,12 +187,12 @@ namespace Game.Systems
         }
         private void ValidateSignInData(string str)
         {
-            bool validation = _emailInput.text.Length > 0 && _passwordInput.text.Length > 8;
+            bool validation = _emailInput.text.Length > 0 && _passwordInput.text.Length >= 8;
             _signInButton.gameObject.SetActive(validation);
         }
         private void ValidateSignUpData(string str)
         {
-            bool validation = _emailInput.text.Length > 0 && _nicknameInput.text.Length > 0 && _passwordInput.text.Length > 8;
+            bool validation = _emailInput.text.Length > 0 && _nicknameInput.text.Length > 0 && _passwordInput.text.Length >= 8;
             _signUpButton.gameObject.SetActive(validation);
         }
 
