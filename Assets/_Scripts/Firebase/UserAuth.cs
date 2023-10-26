@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Game.FirebaseHandler
 {
-    public class UserAuth : MonoBehaviour
+    public static class UserAuth
     {
         public static string LocalEmail
         {
@@ -27,6 +27,16 @@ namespace Game.FirebaseHandler
                 var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
                 if(auth != null && auth.CurrentUser != null)
                     return auth.CurrentUser.DisplayName;
+                return "UNKNOWN";
+            }
+        }
+        public static string UserId
+        {
+            get
+            {
+                var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+                if (auth != null && auth.CurrentUser != null)
+                    return auth.CurrentUser.UserId;
                 return "UNKNOWN";
             }
         }

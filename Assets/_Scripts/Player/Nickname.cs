@@ -14,7 +14,15 @@ namespace Game.Player
         public override void Spawned()
         {
             if (Object.HasInputAuthority)
-                gameObject.name = string.Format("Player({0})", UserAuth.UserNickName);
+            {
+                PlayerNickname = UserAuth.UserNickName;
+                RPC_ApplyNickNameToGO(PlayerNickname);
+            }
+        }
+        [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
+        private void RPC_ApplyNickNameToGO(string nick)
+        {
+            gameObject.name = string.Format("Player({0})", nick);
         }
     }
 }

@@ -2,13 +2,12 @@ using Fusion;
 using Fusion.Sockets;
 using Game.FirebaseHandler;
 using Game.Player;
+using Game.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 namespace Game.Systems
@@ -93,7 +92,7 @@ namespace Game.Systems
         {
             if (lobbyStats.ReadyPlayersCount >= runner.SessionInfo.MaxPlayers)
             {
-                StartCoroutine(LoadScene());
+                LoadGame();
             }
             else
             {
@@ -105,33 +104,18 @@ namespace Game.Systems
         {
             Application.Quit();
         }
-        IEnumerator LoadScene()
+        private ScenesManager CreateSceneManager()
         {
-            _loadingScreen.gameObject.SetActive(true);
-            for (float t = 0; t <= 1;)
-            {
-                t += Time.deltaTime*2;
-                _loadingScreen.alpha = t;
-                yield return null;
-            }
+            var go = new GameObject("ScenesManager");
+            return go.AddComponent<ScenesManager>();
+        }
+        private async void LoadGame()
+        {
+            var sm = ScenesManager.Instance;
+            if (sm == null)
+                sm = CreateSceneManager();
 
-            var process = SceneManager.LoadSceneAsync("Game");
-            int j = 0;
-            while (!process.isDone)
-            {
-                _loadingScreenText.text = string.Format("Loading{0}{1}{2}", j > 0 ? "." : "", j > 1 ? "." : "", j > 2 ? "." : "");
-                j = (j + 1) % 4;
-                yield return new WaitForSeconds(1);
-            }
-
-            for (float t = 0; t <= 1;)
-            {
-                t += Time.deltaTime*2;
-                _loadingScreen.alpha = 1-t;
-                yield return null;
-            }
-
-            _loadingScreen.gameObject.SetActive(false);
+            await sm.ChangeScene("Lobby", "Game");
         }
     }
 }

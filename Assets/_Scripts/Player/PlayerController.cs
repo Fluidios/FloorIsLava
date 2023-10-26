@@ -71,6 +71,7 @@ namespace Game.Player
                     Debug.Log("RMC");
                 }
             }
+            else Debug.Log("No input");
             Velocity = _networkCharacterController.Velocity;
         }
 
