@@ -13,6 +13,7 @@ namespace Game.Lobby
     {
         [SerializeField] private CanvasGroup _loadingScreen;
         [SerializeField] private Image _loadingProgressBar;
+        [SerializeField] private bool _debugMode;
         private void OnEnable()
         {
             if(Instance != null && Instance != this)
@@ -38,15 +39,13 @@ namespace Game.Lobby
             if(_loadingScreen != null)
                 await ShowLoadingScreen();
             float currentProgress = 0;
-            int totalOperations = 3;
-            await LoadSceneAdditeve("MainECS", currentProgress, totalOperations);
-            currentProgress += 1f / totalOperations;
+            int totalOperations = 2;
             await LoadSceneAdditeve("Lobby", currentProgress, totalOperations);
             currentProgress += 1f / totalOperations;
             await UnloadScene("SDK", currentProgress, totalOperations);
             if (_loadingScreen != null)
                 await HideLoadingScreen();
-        }
+        } 
         private async Task LoadSceneAdditeve(string sceneName, float currentProgress, int totalOperationsCount)
         {
             var process = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
@@ -56,7 +55,7 @@ namespace Game.Lobby
                     _loadingProgressBar.fillAmount = currentProgress + process.progress/totalOperationsCount;
                 await Task.Delay(1);
             }
-            Debug.LogFormat("{0} scene loading - done. Active scene - {1}", sceneName, SceneManager.GetActiveScene().name);
+            if(_debugMode) Debug.LogFormat("{0} scene loading - done. Active scene - {1}", sceneName, SceneManager.GetActiveScene().name);
         }
         private async Task UnloadScene(string sceneName, float currentProgress, int totalOperationsCount)
         {
@@ -67,7 +66,7 @@ namespace Game.Lobby
                     _loadingProgressBar.fillAmount = currentProgress + process.progress / totalOperationsCount;
                 await Task.Delay(1);
             }
-            Debug.LogFormat("{0} scene unloading - done. Active scene - {1}", sceneName, SceneManager.GetActiveScene().name);
+            if (_debugMode) Debug.LogFormat("{0} scene unloading - done. Active scene - {1}", sceneName, SceneManager.GetActiveScene().name);
         }
 
         private async Task ShowLoadingScreen()

@@ -7,7 +7,6 @@ namespace Game.ECS
 {
     public struct PlayerStarAchievement : IComponentData
     {
-        public int PlayerGoId;
         public int CollectedStarsAmount;
     }
 }

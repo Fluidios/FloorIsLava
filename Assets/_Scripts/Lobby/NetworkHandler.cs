@@ -24,6 +24,8 @@ namespace Game.Lobby
         private NetworkRunner _runner;
         private INetworkSceneManager _sceneManager;
 
+        public NetworkRunner Runner { get { return _runner; } }
+
         private void Start()
         {
             InitializeRunner();
@@ -71,26 +73,26 @@ namespace Game.Lobby
         }
         private async void FindSessionToJoinOrCreateNew(NetworkRunner runner, List<SessionInfo> sessionList)
         {
-            string sessionToJoin = string.Empty;
+            SessionInfo sessionToJoin = null;
             foreach (SessionInfo sessionInfo in sessionList)
             {
                 if (sessionInfo.IsVisible)
                 {
-                    sessionToJoin = sessionInfo.Name;
+                    sessionToJoin = sessionInfo;
                     break;
                 }
             }
 
             Task<StartGameResult> joinSessionOperation;
-            if (sessionToJoin.Length > 0)
+            if (sessionToJoin != null)
             {
                 Debug.Log("Joining existing session...");
-                joinSessionOperation = JoinSession(runner, GameMode.Client, sessionToJoin, _sceneManager, (runner) => OnConnectedToSession.Invoke(runner));
+                joinSessionOperation = JoinSession(runner, GameMode.Client, sessionToJoin.Name, _sceneManager, (runner) => OnConnectedToSession.Invoke(runner));
             }
             else
             {
                 Debug.Log("Creating new session...");
-                joinSessionOperation = JoinSession(runner, GameMode.Host, sessionToJoin, _sceneManager, (runner) => OnConnectedToSession.Invoke(runner));
+                joinSessionOperation = JoinSession(runner, GameMode.Host, string.Empty, _sceneManager, (runner) => OnConnectedToSession.Invoke(runner));
             }
             await joinSessionOperation;
             if (!joinSessionOperation.Result.Ok)
@@ -122,12 +124,15 @@ namespace Game.Lobby
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) 
         {
-            OnPlayerJoinedToCurrentSession.Invoke(runner, player); 
+            OnPlayerJoinedToCurrentSession.Invoke(runner, player);
+            if (Runner.SessionInfo.PlayerCount == Runner.SessionInfo.MaxPlayers)
+                Runner.SessionInfo.IsVisible = false;
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) 
         {
             OnPlayerLeftCurrentSession.Invoke(runner, player);
+            Runner.SessionInfo.IsVisible = true;
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input) { }

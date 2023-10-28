@@ -11,6 +11,7 @@ namespace Game.Player
 {
     public class PlayerController : NetworkBehaviour
     {
+        public static Action<PlayerController> PlayerDied;
         [SerializeField] private PlayerAnimator _playerAnimator;
         [SerializeField] private Pusher _pusher;
         [SerializeField] private DynamicBody _dynamicBody;
@@ -113,7 +114,7 @@ namespace Game.Player
             _isDead = true;
             _playerAnimator.HandleDeath();
             _hitbox.HitboxActive = false;
-            Debug.Log("Dead");
+            PlayerDied?.Invoke(this);
         }
         [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
         internal void RPC_OnBeingPushed(Vector3 pushPower)

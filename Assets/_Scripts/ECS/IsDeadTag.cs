@@ -1,12 +1,11 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
 
 namespace Game.ECS
 {
-    public class PlayerStarAchievementAuthoring : MonoBehaviour
+    public struct IsDeadTag : IComponentData
     {
-        public Action StarObtained;
     }
 }

@@ -14,27 +14,32 @@ namespace Game.Level
         private NetworkRunner _runner;
         void Start()
         {
-            _runner = FindObjectOfType<NetworkRunner>();
-            if (_runner.IsServer)
-            {
-                for (int i = 0; i < _objectsToPopulate; i++)
-                {
-                    _runner.Spawn(
-                              _prefab,
-                              new Vector3(
-                                  Random.Range(transform.position.x - _spawnVolume.x, transform.position.x + _spawnVolume.x),
-                                  Random.Range(transform.position.y - _spawnVolume.y, transform.position.y + _spawnVolume.y),
-                                  Random.Range(transform.position.z - _spawnVolume.z, transform.position.z + _spawnVolume.z)
-                                  ),
-                              _randomizeYRotation ? Quaternion.Euler(0, Random.value * 360, 0) : Quaternion.identity
-                              );
-                }
-            }
+            StartCoroutine(WaitFrameAndSpawn());
         }
 
         private void OnDrawGizmos()
         {
             Gizmos.DrawWireCube(transform.position, _spawnVolume);
+        }
+        IEnumerator WaitFrameAndSpawn()
+        {
+            yield return null;
+            _runner = FindObjectOfType<NetworkRunner>();
+            if (_runner.IsServer)
+            {
+                for (int i = 0; i < _objectsToPopulate; i++)
+                {
+                    var no = _runner.Spawn(
+                                _prefab,
+                                    new Vector3(
+                                        Random.Range(transform.position.x - _spawnVolume.x, transform.position.x + _spawnVolume.x),
+                                        Random.Range(transform.position.y - _spawnVolume.y, transform.position.y + _spawnVolume.y),
+                                        Random.Range(transform.position.z - _spawnVolume.z, transform.position.z + _spawnVolume.z)
+                                    ),
+                                _randomizeYRotation ? Quaternion.Euler(0, Random.value * 360, 0) : Quaternion.identity
+                              );
+                }
+            }
         }
     }
 }

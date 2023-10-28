@@ -101,6 +101,7 @@ namespace Game.Lobby
         {
             if (lobbyStats.ReadyPlayersCount >= runner.SessionInfo.MaxPlayers)
             {
+
                 LoadGame();
             }
             else
