@@ -4,32 +4,18 @@ using UnityEngine;
 
 namespace Game.FirebaseHandler
 {
-    public static class Achievements
+    [System.Serializable]
+    public class AchivementsMask
     {
-        public static AchivementsMask GetEmptyPlayerAchievementsMask()
+        public Dictionary<string, float> Mask;
+
+        public AchivementsMask()
         {
-            var mask = new Dictionary<string, float>();
-
-            mask.Add("first-victory", 0);
-            mask.Add("brawler", 0);
-            mask.Add("super-star", 0);
-
-            return new AchivementsMask(mask);
+            Mask = new Dictionary<string, float>();
         }
-
-        [System.Serializable]
-        public class AchivementsMask
+        public AchivementsMask(Dictionary<string, float> mask)
         {
-            public Dictionary<string, float> Mask;
-
-            public AchivementsMask()
-            {
-                Mask = new Dictionary<string, float>();
-            }
-            public AchivementsMask(Dictionary<string, float> mask)
-            {
-                Mask = mask;
-            }
+            Mask = mask;
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Game.FirebaseHandler
             return false;
         }
 
-        public static async Task<Achievements.AchivementsMask> LoadUserAchievementsMask(string userID)
+        public static async Task<AchivementsMask> LoadUserAchievementsMask(string userID, Dictionary<string, float> emptyMaskToFill)
         {
             // Load all achievements for the given user ID
             var loadTask = DB.Child(c_achievementsDataBlock).Child(userID).GetValueAsync();
@@ -57,7 +57,6 @@ namespace Game.FirebaseHandler
             }
             else if (loadTask.IsCompleted)
             {
-                var mask = Achievements.GetEmptyPlayerAchievementsMask();
                 DataSnapshot snapshot = loadTask.Result;
                 foreach (DataSnapshot childSnapshot in snapshot.Children)
                 {
@@ -65,9 +64,9 @@ namespace Game.FirebaseHandler
                     {
                         if(float.TryParse(item.Value.ToString(), out float achievementProgress))
                         {
-                            if (mask.Mask.ContainsKey(item.Key))
+                            if (emptyMaskToFill.ContainsKey(item.Key))
                             {
-                                mask.Mask[item.Key] = achievementProgress;
+                                emptyMaskToFill[item.Key] = achievementProgress;
                             }
                             else
                                 Debug.LogWarningFormat("Unexpected achievement \"{0}\" found in database!", item.Key);
@@ -78,11 +77,11 @@ namespace Game.FirebaseHandler
                         }
                     }
                 }
-                return mask;
+                return new AchivementsMask(emptyMaskToFill);
             }
             return null;
         }
-        public static void SyncAchievement(string userID, Achievements.AchivementsMask achievementMask)
+        public static void SyncAchievement(string userID, AchivementsMask achievementMask)
         {
             // Push the achievement object to the database
             string key = DB.Child(c_achievementsDataBlock).Child(userID).Push().Key;

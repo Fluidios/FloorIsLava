@@ -45,30 +45,32 @@ namespace Game.FirebaseHandler
             var auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
             var authTask = auth.CreateUserWithEmailAndPasswordAsync(email, password);
             AuthError error = AuthError.Failure;
-            try
+            await authTask.ContinueWith(task =>
             {
-                await authTask;
-            }
-            catch (Exception e)
-            {
-                if (authTask.Exception != null && authTask.Exception.InnerExceptions[0] != null)
+                if (task.IsCompletedSuccessfully)
                 {
-                    FirebaseException firebaseException = authTask.Exception.InnerExceptions[0] as FirebaseException;
-                    error = (AuthError)firebaseException.ErrorCode;
-                    Debug.LogWarning("Firebase error: " + error);
+                    LocalEmail = authTask.Result.User.Email;
+                    LocalPassword = password;
+                    error = AuthError.None;
                 }
                 else
                 {
-                    Debug.LogWarning("Unknown error: " + e.Message);
-                    error = AuthError.Failure;
+                    if (task.Exception != null && task.Exception.InnerExceptions[0] != null)
+                    {
+                        FirebaseException firebaseException = authTask.Exception.InnerExceptions[0] as FirebaseException;
+                        error = (AuthError)firebaseException.ErrorCode;
+                        Debug.LogWarning("Firebase error: " + error);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Unknown error: " + task.Exception.Message);
+                        error = AuthError.Failure;
+                    }
                 }
-            }
+            });
             if (authTask.IsCompleted)
             {
-                LocalEmail = authTask.Result.User.Email;
-                LocalPassword = password;
                 await UpdateNickname(nickname);
-                return AuthError.None;
             }
             return error;
         }

@@ -1,0 +1,22 @@
+{
+    "name": "Game.Lobby",
+    "rootNamespace": "Game/Lobby",
+    "references": [
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:1d94e1fc58c632648b7f2b50c7831183",
+        "GUID:098813d35e75dd94c8b4b92b8a56d4af",
+        "GUID:263c8c43b92ce4948aae953d9bf6bfe4",
+        "GUID:50a17c548e6881445a92c5efc4a0bd92",
+        "GUID:639778aa706e23c44b5c7b8b0e6c6ae0",
+        "GUID:73d4e1f1df46438489b2b6bbb6901fee"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

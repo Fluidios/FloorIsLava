@@ -39,15 +39,16 @@ namespace Essentials
         public static void OpenLinkScriptingDocumentation(){
             Application.OpenURL("https://guplem.github.io/Essentials/html/");
         }
-        
-        /// <summary>
-        /// Opens a web page containing the GitHub repository of the asset
-        /// </summary>
-        [MenuItem("Help/Essentials/Scripting Documentation",false, 50)]
-        public static void OpenLinkGitHubRepository(){
+
+        ///// <summary>
+        ///// Opens a web page containing the GitHub repository of the asset
+        ///// </summary>
+        //[MenuItem("Help/Essentials/Scripting Documentation",false, 50)]
+        public static void OpenLinkGitHubRepository()
+        {
             Application.OpenURL("https://github.com/guplem/UnityEssentials");
         }
-        
+
         /// <summary>
         /// Opens the web page of the creator of the asset
         /// </summary>

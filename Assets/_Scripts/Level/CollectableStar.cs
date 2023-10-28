@@ -9,7 +9,7 @@ namespace Game.Level
     {
         protected override void HandleInteraction(PlayerController _playerController)
         {
-            Debug.LogFormat("Player {0}({1}) collected a star", _playerController.name, _playerController.Object.InputAuthority.PlayerId);
+            Debug.LogFormat("{0}({1}) collected a star", _playerController.name, _playerController.Object.InputAuthority.PlayerId);
         }
     }
 }
