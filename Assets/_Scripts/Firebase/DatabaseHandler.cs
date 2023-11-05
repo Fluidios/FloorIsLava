@@ -85,18 +85,40 @@ namespace Game.FirebaseHandler
         {
             // Push the achievement object to the database
             string key = DB.Child(c_achievementsDataBlock).Child(userID).Push().Key;
-            DB.Child(c_achievementsDataBlock).Child(userID).Child(key).SetValueAsync(achievementMask.Mask).ContinueWith((task) => {
+            foreach (var item in achievementMask.Mask)
+            {
+                DB.Child(c_achievementsDataBlock).Child(userID).Child(key).Child(item.Key).SetValueAsync(item.Value).ContinueWith((task) => {
+                    if (task.IsCanceled)
+                    {
+                        Debug.LogWarningFormat("Achievement {0} pushing into database was canceled. Error: {1}", item.Key, task.Exception.Message);
+                    }
+                    else if (task.IsFaulted)
+                    {
+                        Debug.LogWarningFormat("Failed to push achievement {0} into database. Error: {1}", item.Key, task.Exception.Message);
+                    }
+                    else
+                    {
+                        Debug.LogFormat("Achievement {0} - successfully pushed into database.", item.Key);
+                    }
+                });
+            }
+        }
+        public static void SyncAchievement(string userID, string achievementName, float achievementProgress)
+        {
+            // Push the achievement object to the database
+            string key = DB.Child(c_achievementsDataBlock).Child(userID).Push().Key;
+            DB.Child(c_achievementsDataBlock).Child(userID).Child(key).Child(achievementName).SetValueAsync(achievementProgress).ContinueWith((task) => {
                 if (task.IsCanceled)
                 {
-                    Debug.LogWarningFormat("Achievements pushing into database was canceled. Error: {0}",  task.Exception.Message);
+                    Debug.LogWarningFormat("Achievement pushing into database was canceled. Error: {0}", task.Exception.Message);
                 }
-                else if(task.IsFaulted)
+                else if (task.IsFaulted)
                 {
                     Debug.LogWarningFormat("Failed to push achievements into database. Error: {0}", task.Exception.Message);
                 }
                 else
                 {
-                    Debug.LogFormat("Achievements - successfully pushed into database.");
+                    Debug.LogFormat("Achievement - successfully pushed into database.");
                 }
             });
         }

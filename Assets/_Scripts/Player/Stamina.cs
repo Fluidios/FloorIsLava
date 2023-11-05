@@ -13,7 +13,14 @@ namespace Game.Player
         private const float _hitStaminaPrice = 50;
         [Networked]
         public float CurrentStamina { get; set; }
-        public float Normalized => CurrentStamina / _maxStamina;
+        public float Normalized
+        {
+            get
+            {
+                if (Runner == null || Runner.IsShutdown) return 0;
+                return CurrentStamina / _maxStamina;
+            }
+        } 
         public override void Spawned()
         {
             base.Spawned();

@@ -13,6 +13,7 @@ namespace Game.ECS
     public partial class PlayersSpawnerSystem : SystemBase
     {
         internal static NetworkHandler NetworkHandler { get; private set; }
+        internal static bool AllPlayersSpawnedAndRegistered;
         internal static Dictionary<int, Entity> NetworkPlayerEntityAssociations = new Dictionary<int, Entity>();
         private PlayersSpawner _playersSpawner;
         private List<PlayerRef> _playersToSpawn;
@@ -26,11 +27,13 @@ namespace Game.ECS
             _playersToSpawn = new List<PlayerRef>();
             _playersToDespawn = new List<PlayerRef>();
             SceneManager.sceneLoaded += OnNewSceneLoaded;
+            GameEndsObserverSystem.GameEnds += OnGameEnds;
         }
         protected override void OnStopRunning()
         {
             base.OnStopRunning();
             SceneManager.sceneLoaded -= OnNewSceneLoaded;
+            GameEndsObserverSystem.GameEnds -= OnGameEnds;
         }
 
         private void OnNewSceneLoaded(Scene arg0, LoadSceneMode arg1)
@@ -47,6 +50,12 @@ namespace Game.ECS
                     OnLoadToGameScene();
                     break;
             }
+        }
+        private void OnGameEnds()
+        {
+            AllPlayersSpawnedAndRegistered = false;
+            NetworkPlayerEntityAssociations.Clear();
+            NetworkHandler = null;
         }
 
         private void FindAndSubscribeToNetworkHandlerIfNeeded()
@@ -115,8 +124,11 @@ namespace Game.ECS
             {
                 var archetype = EntityManager.CreateArchetype(playerAuthoring.GetArchetypeTypes());
                 var entity = EntityManager.CreateEntity(archetype);
+                EntityManager.AddComponent<IsPlayerTag>(entity);
                 EntityManager.SetComponentData(entity, playerAuthoring.GetStarAchievementAuthoringData());
                 NetworkPlayerEntityAssociations.Add(playerRef.PlayerId, entity);
+                if (NetworkPlayerEntityAssociations.Count >= NetworkHandler.Runner.SessionInfo.PlayerCount)
+                    AllPlayersSpawnedAndRegistered = true;
             }
         }
         private void TryReleasePlayersEntity(NetworkObject deadman)

@@ -5371,8 +5371,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a949716a2b040a5449dd4bada86ab628, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lobby: {fileID: 0}
-  _sessionsSize: 1
+  _lobby: {fileID: 2143074345}
+  _sessionsSize: 2
   OnConnectedToSession:
     m_PersistentCalls:
       m_Calls: []
@@ -8466,12 +8466,8 @@ MonoBehaviour:
   _achievementViewForm: {fileID: 88847328}
   _achievementsDictionary:
     _keys:
-    - First Victory
-    - Brawler
     - Super Star
     _values:
-    - {fileID: 11400000, guid: 684cf88bd77137949a337dcaf9fcf9f2, type: 2}
-    - {fileID: 11400000, guid: 07aad6bf37d3c2a429f20d083495ff99, type: 2}
     - {fileID: 11400000, guid: 7d63354897bc7ab448a8ae0301f0a2ea, type: 2}
 --- !u!114 &2143074345
 MonoBehaviour:

@@ -10,10 +10,22 @@ namespace Game.ECS
 {
     public partial class CollectedStarsCounterSystem : SystemBase
     {
-        SystemHandle m_EndSimulationECBSystem;
         List<int> _addStarsToThisPlayers;
         private Entity _entity;
-        private int _alreadyCollectedStars;
+        private static Dictionary<int, int> _cashedResults = new Dictionary<int, int>();
+        public static Vector2Int[] CurrentResults
+        {
+            get
+            {
+                var output = new Vector2Int[_cashedResults.Count];
+                int i = 0;
+                foreach (var item in _cashedResults)
+                {
+                    output[i] = new Vector2Int(item.Key, item.Value); 
+                }
+                return output; 
+            }
+        }
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -38,8 +50,12 @@ namespace Game.ECS
                 if (PlayersSpawnerSystem.NetworkPlayerEntityAssociations.ContainsKey(item))
                 {
                     _entity = PlayersSpawnerSystem.NetworkPlayerEntityAssociations[item];
-                    //_alreadyCollectedStars = EntityManager.GetComponentData<PlayerStarAchievement>(_entity).CollectedStarsAmount;
                     SystemAPI.GetComponentRW<PlayerStarAchievement>(_entity).ValueRW.CollectedStarsAmount += 1;
+                    if (_cashedResults.ContainsKey(item))
+                        _cashedResults[item] = SystemAPI.GetComponentRO<PlayerStarAchievement>(_entity).ValueRO.CollectedStarsAmount;
+                    else
+                        _cashedResults.Add(item, SystemAPI.GetComponentRO<PlayerStarAchievement>(_entity).ValueRO.CollectedStarsAmount);
+
                     Debug.Log(string.Format("Entity({0}): {1}", _entity.Index, SystemAPI.GetComponentRO<PlayerStarAchievement>(_entity).ValueRO.CollectedStarsAmount));
                 }
             }

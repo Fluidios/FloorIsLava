@@ -42,4 +42,8 @@ namespace Game.Level
             }
         }
     }
+    public interface ISpawnedObjectsSetup
+    {
+        public void Setup(NetworkObject spawnedObject);
+    }
 }

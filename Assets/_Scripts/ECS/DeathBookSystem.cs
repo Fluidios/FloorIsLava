@@ -32,7 +32,7 @@ namespace Game.ECS
                 if (PlayersSpawnerSystem.NetworkPlayerEntityAssociations.ContainsKey(deadman))
                 {
                     EntityManager.AddComponent<IsDeadTag>(PlayersSpawnerSystem.NetworkPlayerEntityAssociations[deadman]);
-                    //Debug.Log(string.Format("Entity({0}) - marked as died.", PlayersSpawnerSystem.NetworkPlayerEntityAssociations[deadman].Index));
+                    Debug.Log(string.Format("Entity({0}) - marked as died.", PlayersSpawnerSystem.NetworkPlayerEntityAssociations[deadman].Index));
                 }
             }
             _toMarkAsDied.Clear();

@@ -160,10 +160,11 @@
         "Game.Player",
         "Game.Systems",
         "Game.Level",
-        "Game.Lobby"
+        "Game.Lobby",
+        "Game.UI"
     ],
     "UseSerializableDictionary": true,
     "NullChecksForNetworkedProperties": true,
-    "CheckRpcAttributeUsage": false,
+    "CheckRpcAttributeUsage": true,
     "CheckNetworkedPropertiesBeingEmpty": false
 }

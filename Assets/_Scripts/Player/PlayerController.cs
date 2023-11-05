@@ -69,10 +69,17 @@ namespace Game.Player
                 }
                 if ((data.buttons & NetworkInputData.MouseButton1) != 0)
                 {
+#if UNITY_EDITOR
                     Debug.Log("RMC");
+#endif
                 }
             }
-            else Debug.Log("No input");
+            else
+            {
+#if UNITY_EDITOR
+                Debug.Log("No input");
+#endif
+            }
             Velocity = _networkCharacterController.Velocity;
         }
 

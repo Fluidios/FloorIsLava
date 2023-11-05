@@ -15,13 +15,13 @@ namespace Game.Player
         {
             if (Object.HasInputAuthority)
             {
-                PlayerNickname = UserAuth.UserNickName;
-                RPC_ApplyNickNameToGO(PlayerNickname);
+                RPC_ApplyNickNameToGO(UserAuth.UserNickName);
             }
         }
         [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
         private void RPC_ApplyNickNameToGO(string nick)
         {
+            PlayerNickname = nick;
             gameObject.name = string.Format("Player({0})", nick);
         }
     }
