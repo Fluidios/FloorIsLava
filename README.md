@@ -8,4 +8,5 @@ Press ready, wait for other player.
 Collect stars and bonuses on map.
 Push other player to lava to win.
 
-PS. You should pass registration to start the game, just pass any email, nickname and password and you are good to go!
+PS. You should pass registration to start the game, just pass any email, nickname and password and you are good to go! 
+You can download apk file in releases.
